@@ -1,6 +1,8 @@
 extern crate ws;
 extern crate uuid;
 
+use std::sync::mpsc;
+
 use serde_json;
 use ws::{Sender};
 use client::LoginMessage;
@@ -12,15 +14,21 @@ pub struct WsClient {
 	id: String,
 	validated: bool,
 	client: Sender,
+	sender: mpsc::Sender<()>,
 }
 
 impl WsClient {
-	pub fn new(client: Sender) -> WsClient {
+	pub fn new(client: Sender, sender: mpsc::Sender<()>) -> WsClient {
 		WsClient {
 			id: uuid::Uuid::new_v4().to_simple_string(),
 			validated: false,
-			client: client
+			client: client,
+			sender: sender
 		}
+	}
+
+	pub fn get_id(&self) -> String {
+		self.id.clone()
 	}
 
 	pub fn proccess_message(&self, packet: String) -> () {
