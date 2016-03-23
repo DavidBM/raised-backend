@@ -5,7 +5,7 @@ pub mod server {
 	use std::thread;
 
 
-	use client::{WsClient, GameClient};
+	use client::{WsClient, GameClient, Message as GameMessage};
 	use waiting_queue::WaitingQueue;
 
 	impl Handler for WsClient {
@@ -37,7 +37,6 @@ pub mod server {
 		}
 	}
 
-
 	pub fn start() {
 		let (tx_wq, rx_wq): (Sender<GameClient>, Receiver<GameClient>) = mpsc::channel();
 
@@ -47,7 +46,7 @@ pub mod server {
 		});
 
 		listen("127.0.0.1:3012", |out| {
-			let (tx, rx): (Sender<()>, Receiver<()>) = mpsc::channel();
+			let (tx, rx): (Sender<Box<GameMessage + Send>>, Receiver<Box<GameMessage + Send>>) = mpsc::channel();
 
 			let ws_client = WsClient::new(out, tx);
 
@@ -60,5 +59,4 @@ pub mod server {
 			ws_client
 		}).unwrap()
 	}
-
 }
