@@ -5,8 +5,7 @@ use std::sync::mpsc;
 
 use serde_json;
 use ws::{Sender};
-use client::LoginMessage;
-use client::MessageType;
+use client::{LoginMessage, MessageType, PlayerMove, Message as GameMessage};
 
 
 #[derive(Debug)]
@@ -14,11 +13,11 @@ pub struct WsClient {
 	id: String,
 	validated: bool,
 	client: Sender,
-	sender: mpsc::Sender<()>,
+	sender: mpsc::Sender<Box<GameMessage + Send>>,
 }
 
 impl WsClient {
-	pub fn new(client: Sender, sender: mpsc::Sender<()>) -> WsClient {
+	pub fn new(client: Sender, sender: mpsc::Sender<Box<GameMessage + Send>>) -> WsClient {
 		WsClient {
 			id: uuid::Uuid::new_v4().to_simple_string(),
 			validated: false,
@@ -39,7 +38,9 @@ impl WsClient {
 
 		match decoded {
 			Ok(data) => self.extract_data(data, text),
-			Err(_) => (),
+			Err(_) => {
+				println!("Not identify package");
+			},
 		}
 	}
 
@@ -53,6 +54,17 @@ impl WsClient {
 					Err(_) => (),
 				};
 			},
+			"move" => {
+				let decoded: Result<PlayerMove, _> = serde_json::from_str(packet);
+
+				match decoded {
+					Ok(data) => {
+						self.sender.send(Box::new(PlayerMove{x: data.x, y: data.y})).unwrap();
+						()
+					},
+ 						Err(_) => (),
+ 					};
+ 				},
 			_ => println!("Not know message type: {}", message.t)
 		}
 	}
