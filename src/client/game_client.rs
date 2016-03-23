@@ -16,17 +16,14 @@ impl GameClient {
 	pub fn get_message(&self) -> Vec<GameMessage> {
 		let mut messages: Vec<GameMessage> = Vec::new();
 
-		loop {
-			let message = self.receiver.try_recv();
-			match message {
-				Ok(game_message) => {
-					messages.push(game_message);
-				},
-				Err(_) => break,
-			}
+		while let Ok(game_message) = self.receiver.try_recv() {
+			messages.push(game_message);
 		}
+
 		println!("{:?}s received", messages.len());
+
 		thread::sleep(time::Duration::new(1, 0));
+
 		messages
 	}
 }

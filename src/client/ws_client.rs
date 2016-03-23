@@ -31,7 +31,7 @@ impl WsClient {
 		self.id.clone()
 	}
 
-	pub fn proccess_message(&self, packet: String) -> () {
+	pub fn proccess_message(&self, packet: String) {
 
 		let text = packet.as_str();
 
@@ -45,27 +45,22 @@ impl WsClient {
 		}
 	}
 
-	fn extract_data(&self, message: MessageType, packet: &str) -> () {
+	fn extract_data(&self, message: MessageType, packet: &str) {
 		match message.t.as_ref() {
 			"login" => {
 				let decoded: Result<LoginMessage, _> = serde_json::from_str(packet);
 
-				match decoded {
-					Ok(data) => println!("Loggin message received: {:?}", data),
-					Err(_) => (),
-				};
+				if let Ok(data) = decoded{
+					println!("Loggin message received: {:?}", data)
+				}
 			},
 			"move" => {
 				let decoded: Result<PlayerMove, _> = serde_json::from_str(packet);
 
-				match decoded {
-					Ok(data) => {
-						self.sender.send(GameMessage::PlayerMove(data)).unwrap();
-						()
-					},
- 						Err(_) => (),
- 					};
- 				},
+				if let Ok(data) = decoded{
+					self.sender.send(GameMessage::PlayerMove(data)).unwrap();
+				}
+			}
 			_ => println!("Not know message type: {}", message.t)
 		}
 	}

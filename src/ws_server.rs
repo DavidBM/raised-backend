@@ -15,9 +15,8 @@ pub mod server {
 		}
 
 		fn on_message(&mut self, msg: Message) -> Result<()> {
-			match msg.into_text() {
-				Ok(message) => self.proccess_message(message),
-				Err(message) => println!("No message or binnary message: '{}'", message),
+			if let Ok(message) = msg.into_text(){
+				self.proccess_message(message)
 			}
 
 			Ok(())
