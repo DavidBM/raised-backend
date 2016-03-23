@@ -1,23 +1,20 @@
 use std::sync::mpsc;
-
 use std::{thread, time};
-use std::fmt;
-use std::fmt::Debug;
-use client::Message;
+use client::Message as GameMessage;
 
 #[derive(Debug)]
 pub struct GameClient {
 	id: String,
-	receiver: mpsc::Receiver<Box<Message + Send>>
+	receiver: mpsc::Receiver<GameMessage>
 }
 
 impl GameClient {
-	pub fn new(id: String, receiver: mpsc::Receiver<Box<Message + Send>>) -> GameClient {
+	pub fn new(id: String, receiver: mpsc::Receiver<GameMessage>) -> GameClient {
 		GameClient {id: id, receiver: receiver}
 	}
 
-	pub fn get_message(&self) {
-		let mut messages: Vec<Box<Message>> = Vec::new();
+	pub fn get_message(&self) -> Vec<GameMessage> {
+		let mut messages: Vec<GameMessage> = Vec::new();
 
 		loop {
 			let message = self.receiver.try_recv();
@@ -28,13 +25,8 @@ impl GameClient {
 				Err(_) => break,
 			}
 		}
-		thread::sleep(time::Duration::new(1, 0));
 		println!("{:?}s received", messages.len());
-	}
-}
-
-impl Debug for Box<Message> {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "I'm a structure :D",)
+		thread::sleep(time::Duration::new(1, 0));
+		messages
 	}
 }

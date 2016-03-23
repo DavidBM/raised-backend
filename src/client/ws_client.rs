@@ -5,7 +5,8 @@ use std::sync::mpsc;
 
 use serde_json;
 use ws::{Sender};
-use client::{LoginMessage, MessageType, PlayerMove, Message as GameMessage};
+use client::*;
+use client::Message as GameMessage;
 
 
 #[derive(Debug)]
@@ -13,11 +14,11 @@ pub struct WsClient {
 	id: String,
 	validated: bool,
 	client: Sender,
-	sender: mpsc::Sender<Box<GameMessage + Send>>,
+	sender: mpsc::Sender<GameMessage>,
 }
 
 impl WsClient {
-	pub fn new(client: Sender, sender: mpsc::Sender<Box<GameMessage + Send>>) -> WsClient {
+	pub fn new(client: Sender, sender: mpsc::Sender<GameMessage>) -> WsClient {
 		WsClient {
 			id: uuid::Uuid::new_v4().to_simple_string(),
 			validated: false,
@@ -59,7 +60,7 @@ impl WsClient {
 
 				match decoded {
 					Ok(data) => {
-						self.sender.send(Box::new(PlayerMove{x: data.x, y: data.y})).unwrap();
+						self.sender.send(GameMessage::PlayerMove(data)).unwrap();
 						()
 					},
  						Err(_) => (),

@@ -46,7 +46,7 @@ pub mod server {
 		});
 
 		listen("127.0.0.1:3012", |out| {
-			let (tx, rx): (Sender<Box<GameMessage + Send>>, Receiver<Box<GameMessage + Send>>) = mpsc::channel();
+			let (tx, rx): (Sender<GameMessage>, Receiver<GameMessage>) = mpsc::channel();
 
 			let ws_client = WsClient::new(out, tx);
 
