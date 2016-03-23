@@ -22,7 +22,10 @@ impl WaitingQueue {
 	}
 
 	pub fn add_client(&mut self, client: client::GameClient) {
-		self.clients.push(client);
+		loop {
+			client.get_message();
+		}
+		//self.clients.push(client);
 	}
 
 	pub fn check_clients(&mut self) {
