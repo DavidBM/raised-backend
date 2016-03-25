@@ -66,11 +66,6 @@ impl WsClient {
 			_ => println!("Not know message type: {}", message.t)
 		}
 	}
-
-	pub fn close(&self) {
-		let action = ClientActions::Delete(self.id.clone());
-		self.waiting_sender.send(action).unwrap();
-	}
 }
 
 impl ws::Handler for WsClient {
@@ -89,7 +84,8 @@ impl ws::Handler for WsClient {
 	}
 
 	fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
-		self.close();
+		let action = ClientActions::Delete(self.id.clone());
+		self.waiting_sender.send(action).unwrap();
 
 		match code {
 			ws::CloseCode::Normal => println!("The client is done with the connection."),

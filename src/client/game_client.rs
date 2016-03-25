@@ -34,7 +34,6 @@ impl GameClient {
 	pub fn process_message(message: GameMessage) -> Result<(), ()> {
 		match message {
 			GameMessage::PlayerMove(_) => Ok(()),
-			GameMessage::MessageType(_) => Ok(()),
 			GameMessage::LoginMessage(_) => Ok(()),
 		}
 	}

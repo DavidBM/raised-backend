@@ -1,7 +1,6 @@
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Message {
 	LoginMessage (LoginMessage),
-	MessageType (MessageType),
 	PlayerMove (PlayerMove),
 }
 

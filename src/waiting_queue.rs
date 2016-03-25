@@ -44,7 +44,7 @@ impl WaitingQueue {
 
 		if let Some(index) = index {
 			let client = self.clients.swap_remove(index);
-			println!("Client removed from waiting queue. ID: {:?}", client);
+			println!("Client removed from waiting queue: {:?}", client);
 		}
 	}
 
