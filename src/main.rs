@@ -14,5 +14,5 @@ mod ws_server;
 use ws_server::server;
 
 fn main() {
-	server::start();
+	server::start("127.0.0.1:3012");
 }

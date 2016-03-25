@@ -4,26 +4,28 @@ extern crate uuid;
 use std::sync::mpsc;
 
 use serde_json;
-use ws::{Sender};
 use client::*;
 use client::Message as GameMessage;
+use waiting_queue::ClientActions;
 
 
 #[derive(Debug)]
 pub struct WsClient {
 	id: String,
 	validated: bool,
-	client: Sender,
+	client: ws::Sender,
 	sender: mpsc::Sender<GameMessage>,
+	waiting_sender: mpsc::Sender<ClientActions>,
 }
 
 impl WsClient {
-	pub fn new(client: Sender, sender: mpsc::Sender<GameMessage>) -> WsClient {
+	pub fn new(client: ws::Sender, sender: mpsc::Sender<GameMessage>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
 		WsClient {
 			id: uuid::Uuid::new_v4().to_simple_string(),
 			validated: false,
 			client: client,
-			sender: sender
+			sender: sender,
+			waiting_sender: waiting_sender
 		}
 	}
 
@@ -63,5 +65,41 @@ impl WsClient {
 			}
 			_ => println!("Not know message type: {}", message.t)
 		}
+	}
+
+	pub fn close(&self) {
+		let action = ClientActions::Delete(self.id.clone());
+		self.waiting_sender.send(action).unwrap();
+	}
+}
+
+impl ws::Handler for WsClient {
+
+	fn on_open(&mut self, _: ws::Handshake) -> ws::Result<()> {
+		//println!("New connection...");
+		Ok(())
+	}
+
+	fn on_message(&mut self, msg: ws::Message) -> ws::Result<()> {
+		if let Ok(message) = msg.into_text(){
+			self.proccess_message(message)
+		}
+
+		Ok(())
+	}
+
+	fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
+		self.close();
+
+		match code {
+			ws::CloseCode::Normal => println!("The client is done with the connection."),
+			ws::CloseCode::Away   => println!("The client is leaving the site."),
+			ws::CloseCode::Abnormal => println!("Closing handshake failed! Unable to obtain closing status from client."),
+			_ => println!("The client encountered an error: {}", reason),
+		}
+	}
+
+	fn on_error(&mut self, err: ws::Error) {
+		println!("The server encountered an error: {:?}", err);
 	}
 }
