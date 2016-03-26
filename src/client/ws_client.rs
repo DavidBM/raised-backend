@@ -41,29 +41,31 @@ impl WsClient {
 
 		match decoded {
 			Ok(data) => self.extract_data(data, text),
-			Err(_) => {
-				println!("Not identify package");
-			},
+			Err(_) => println!("Not identify package"),
 		}
 	}
 
 	fn extract_data(&self, message: MessageType, packet: &str) {
 		match message.t.as_ref() {
-			"login" => {
-				let decoded: Result<LoginMessage, _> = serde_json::from_str(packet);
-
-				if let Ok(data) = decoded{
-					println!("Loggin message received: {:?}", data)
-				}
-			},
-			"move" => {
-				let decoded: Result<PlayerMove, _> = serde_json::from_str(packet);
-
-				if let Ok(data) = decoded{
-					self.sender.send(GameMessage::PlayerMove(data)).unwrap();
-				}
-			}
+			"login" => self.login_message(packet),
+			"move" => self.move_message(packet),
 			_ => println!("Not know message type: {}", message.t)
+		}
+	}
+
+	fn login_message(&self, packet: &str) {
+		let decoded: Result<LoginMessage, _> = serde_json::from_str(packet);
+
+		if let Ok(data) = decoded {
+			self.sender.send(GameMessage::LoginMessage(data)).unwrap();
+		}
+	}
+
+	fn move_message(&self, packet: &str) {
+		let decoded: Result<PlayerMove, _> = serde_json::from_str(packet);
+
+		if let Ok(data) = decoded {
+			self.sender.send(GameMessage::PlayerMove(data)).unwrap();
 		}
 	}
 }

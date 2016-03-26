@@ -3,8 +3,8 @@ use client;
 
 #[derive(Debug)]
 pub enum ClientActions {
-    New(client::GameClient),
-    Delete(String)
+	New(client::GameClient),
+	Delete(String)
 }
 
 #[derive(Debug)]
@@ -23,13 +23,13 @@ impl WaitingQueue {
 		loop {
 			let client = self.receiver.recv().unwrap();
 			match client {
-			    ClientActions::New(client) => {
-			    	self.add_client(client);
-			    	self.check_clients();
-			    },
-			    ClientActions::Delete(id) => {
-			    	self.remove_client(id);
-			    },
+				ClientActions::New(client) => {
+					self.add_client(client);
+					self.check_clients();
+				},
+				ClientActions::Delete(id) => {
+					self.remove_client(id);
+				},
 			}
 		}
 	}
