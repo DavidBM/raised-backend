@@ -5,3 +5,4 @@ pub use self::game_client::GameClient;
 mod messages;
 mod ws_client;
 mod game_client;
+pub mod ws_server;

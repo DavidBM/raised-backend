@@ -4,9 +4,9 @@ extern crate uuid;
 use std::sync::mpsc;
 
 use serde_json;
-use client::*;
-use client::Message as GameMessage;
-use waiting_queue::ClientActions;
+use net::*;
+use net::Message as GameMessage;
+use game::structs::ClientActions;
 
 
 #[derive(Debug)]
@@ -88,6 +88,8 @@ impl ws::Handler for WsClient {
 	fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
 		let action = ClientActions::Delete(self.id.clone());
 		self.waiting_sender.send(action).unwrap();
+
+		self.sender.send(GameMessage::PlayerDisconnected).unwrap();
 
 		match code {
 			ws::CloseCode::Normal => println!("The client is done with the connection."),

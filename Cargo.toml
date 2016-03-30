@@ -5,6 +5,7 @@ authors = ["David Bonet <webbonet@gmail.com>"]
 
 [dependencies]
 ws = "^0.4.5"
+time = "0.1"
 env_logger = "0.3.2"
 rustc-serialize = "0.3"
 uuid = "0.1"

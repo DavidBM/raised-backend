@@ -6,13 +6,11 @@ extern crate ws;
 extern crate env_logger;
 extern crate serde;
 extern crate serde_json;
+extern crate time;
 
-mod waiting_queue;
-mod client;
-mod ws_server;
-
-use ws_server::server;
+mod game;
+mod net;
 
 fn main() {
-	server::start("127.0.0.1:3012");
+	net::ws_server::start("127.0.0.1:3012");
 }

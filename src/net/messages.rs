@@ -2,6 +2,7 @@
 pub enum Message {
 	LoginMessage (LoginMessage),
 	PlayerMove (PlayerMove),
+	PlayerDisconnected
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -17,3 +18,5 @@ pub struct PlayerMove {
 pub struct LoginMessage {
 	pub token: String,
 }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PlayerDisconnected;

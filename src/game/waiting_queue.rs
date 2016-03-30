@@ -1,21 +1,18 @@
 use std::sync::mpsc::{Receiver};
-use client;
-
-#[derive(Debug)]
-pub enum ClientActions {
-	New(client::GameClient),
-	Delete(String)
-}
+use game::structs::ClientActions;
+use net;
+use game::{Game, Map, Player};
+use std::thread;
 
 #[derive(Debug)]
 pub struct WaitingQueue {
-	clients: Vec<client::GameClient>,
+	clients: Vec<net::GameClient>,
 	receiver: Receiver<ClientActions>
 }
 
 impl WaitingQueue {
 	pub fn new(receiver: Receiver<ClientActions>) -> WaitingQueue {
-		let clients: Vec<client::GameClient> = Vec::new();
+		let clients: Vec<net::GameClient> = Vec::new();
 		WaitingQueue { clients:  clients, receiver: receiver }
 	}
 
@@ -34,7 +31,7 @@ impl WaitingQueue {
 		}
 	}
 
-	pub fn add_client(&mut self, client: client::GameClient) {
+	pub fn add_client(&mut self, client: net::GameClient) {
 		println!("Client added to waiting queue. ID: {:?}", client);
 		self.clients.push(client);
 	}
@@ -51,12 +48,25 @@ impl WaitingQueue {
 	pub fn check_clients(&mut self) {
 		if self.clients.len() < 4 { return }
 
-		let mut players: Vec<client::GameClient> = Vec::new();
+		let mut game = self.create_game();
 
 		for _ in 0..4 {
-			players.push(self.clients.remove(0));
+			let client = self.clients.remove(0);
+			let player = self.create_player(client);
+			game.add_player(player);
 		}
 
-		//TODO: Create game
+		thread::spawn(move || {
+			game.start();
+		});
+	}
+
+	fn create_game(&self) -> Game {
+		let map = Map::new();
+		Game::new(map)
+	}
+
+	fn create_player(&self, client: net::GameClient) -> Player {
+		Player::new(client)
 	}
 }
