@@ -1,5 +1,6 @@
 use game::Map;
 use game::Player;
+use game::PlayerIntention;
 use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
@@ -29,29 +30,45 @@ impl Game {
 
 			self.compute(time - last_time);
 
-			let after_compute_time = precise_time_ns();
-
-			let duration = (after_compute_time - time) / 1000u64;
-
+			last_time = precise_time_ns();
+			let duration = last_time - time;
 			let sleep_time = (frame_duration - duration) as u32;
 
-			let sleep_time = Duration::new(0, sleep_time);
-
-			last_time = after_compute_time;
-
-			sleep(sleep_time);
+			if sleep_time > 0 {
+				sleep(Duration::new(0, sleep_time));
+			} else {
+				println!("Server needs more power! ò_ó -> {:?}", duration);
+			}
 		}
 	}
 
 	fn compute(&mut self, elapsed: u64) {
-		for player in &self.players {
-			let messages = player.get_actions();
+		let actions = self.process_players_messages(elapsed);
+		self.process_world(actions);
+		self.process_players();
+		self.send_player_responses()
+	}
 
-			if let Some(messages) = messages {
-				for message in messages {
-					player.process_message(message, elapsed);
-				}
-			}
+	fn process_players_messages(&self, elapsed: u64) -> Vec<PlayerIntention> {
+		let mut intentions: Vec<PlayerIntention> = Vec::new();
+
+		for player in &self.players {
+			let player_intentions = player.process_messages(elapsed);
+			intentions.extend_from_slice(&player_intentions);
 		}
+
+		return intentions;
+	}
+
+	fn process_world(&self, intentions: Vec<PlayerIntention>) {
+
+	}
+
+	fn send_player_responses(&self) {
+		unimplemented!();
+	}
+
+	fn process_players(&self) {
+		unimplemented!();
 	}
 }

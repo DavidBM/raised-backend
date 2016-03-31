@@ -11,8 +11,9 @@ pub struct MessageType {
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerMove {
-	pub x: i32,
-	pub y: i32,
+	pub direction: f32,
+	pub velocity: f32,
+
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LoginMessage {
