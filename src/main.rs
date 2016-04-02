@@ -7,6 +7,8 @@ extern crate env_logger;
 extern crate serde;
 extern crate serde_json;
 extern crate time;
+#[macro_use]
+extern crate mac;
 
 mod game;
 mod net;

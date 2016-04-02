@@ -3,17 +3,19 @@ use game::structs::ClientActions;
 use net;
 use game::{Game, Map, Player};
 use std::thread;
+use std::u64;
 
 #[derive(Debug)]
 pub struct WaitingQueue {
 	clients: Vec<net::GameClient>,
-	receiver: Receiver<ClientActions>
+	receiver: Receiver<ClientActions>,
+	players_count: u64,
 }
 
 impl WaitingQueue {
 	pub fn new(receiver: Receiver<ClientActions>) -> WaitingQueue {
 		let clients: Vec<net::GameClient> = Vec::new();
-		WaitingQueue { clients:  clients, receiver: receiver }
+		WaitingQueue { clients:  clients, receiver: receiver, players_count: 0 }
 	}
 
 	pub fn wait_clients(&mut self) {
@@ -66,7 +68,12 @@ impl WaitingQueue {
 		Game::new(map)
 	}
 
-	fn create_player(&self, client: net::GameClient) -> Player {
-		Player::new(client)
+	fn create_player(&mut self, client: net::GameClient) -> Player {
+		let player_id = self.players_count;
+		self.players_count += 1;
+
+		if self.players_count > u64::MAX - 10 { self.players_count = 0; }
+
+		Player::new(client, player_id)
 	}
 }

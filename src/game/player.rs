@@ -2,16 +2,19 @@ use net::GameClient as Client;
 use net::Message as Actions;
 use net;
 use game::MapPosition;
+use game::map::PlayerEffects;
 use std::f32::consts::PI as PIf32;
 
 #[derive(Debug)]
 pub struct Player {
+	pub id: u64,
 	net: Client,
 	position: MapPosition
 }
 #[derive(Debug, Clone)]
 pub enum Intention {
 	Move {
+		player_id: u64,
 		x: f32,
 		y: f32,
 		z: f32,
@@ -21,8 +24,8 @@ pub enum Intention {
 }
 
 impl Player {
-	pub fn new(client: Client) -> Player {
-		Player {net: client, position: MapPosition {x: 0f32, y: 0f32, z: 0f32}}
+	pub fn new(client: Client, id: u64) -> Player {
+		Player {net: client, position: MapPosition {x: 0f32, y: 0f32, z: 0f32}, id: id}
 	}
 
 	pub fn get_actions(&self) -> Option<Vec<Actions>> {
@@ -61,10 +64,22 @@ impl Player {
 		}
 
 		Intention::Move {
+			player_id: self.id,
 			x: x,
 			y: y,
 			z: self.position.z,
 			direction: direction
 		}
+	}
+
+	pub fn apply_effect(&mut self, effect: &PlayerEffects) {
+		match effect {
+			&PlayerEffects::Position{x, y, z, ..} => self.set_position(x, y, z),
+		}
+	}
+
+	pub fn set_position(&mut self, x:f32, y:f32, z:f32) {
+		println!("Position changed, x:{} y: {} z:{}", x, y, z);
+		self.position = MapPosition{x: x, y: y, z: z};
 	}
 }

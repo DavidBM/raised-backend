@@ -1,6 +1,7 @@
 use game::Map;
 use game::Player;
 use game::PlayerIntention;
+use game::map::PlayerEffects;
 use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
@@ -44,9 +45,9 @@ impl Game {
 
 	fn compute(&mut self, elapsed: u64) {
 		let actions = self.process_players_messages(elapsed);
-		self.process_world(actions);
-		self.process_players();
-		self.send_player_responses()
+		let effects = self.process_world(&actions);
+		self.apply_effects_on_players(&effects);
+		//self.delete_players();
 	}
 
 	fn process_players_messages(&self, elapsed: u64) -> Vec<PlayerIntention> {
@@ -60,15 +61,32 @@ impl Game {
 		return intentions;
 	}
 
-	fn process_world(&self, intentions: Vec<PlayerIntention>) {
+	fn process_world(&self, intentions: &Vec<PlayerIntention>) -> Vec<PlayerEffects> {
+		let mut player_effects: Vec<PlayerEffects> = Vec::new();
 
+		for intention in intentions {
+			let intentions = self.map.process_player_intention(intention);
+			if let Some(intentions) = intentions {
+				for intention in intentions {
+					player_effects.push(intention);
+				}
+			}
+		}
+
+		player_effects
 	}
 
-	fn send_player_responses(&self) {
-		unimplemented!();
+	fn apply_effects_on_players(&mut self, effects: &Vec<PlayerEffects>) {
+		//Could be better whith the macro maybe!, but is not implemented
+		for effect in effects {
+		    let player_id = unwrap_or_return!(effect.get_id(), ());
+		    let player_index = unwrap_or_return!(self.players.iter().position(|player| player.id == player_id), ());
+		    let player = unwrap_or_return!(self.players.get_mut(player_index), ());
+		    player.apply_effect(effect);
+		}
 	}
 
-	fn process_players(&self) {
+	fn delete_players(&self) {
 		unimplemented!();
 	}
 }
