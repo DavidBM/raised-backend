@@ -5,7 +5,7 @@ use std::sync::mpsc;
 
 use serde_json;
 use net::*;
-use net::Message as GameMessage;
+use net::{Message as GameMessage};
 use game::structs::ClientActions;
 
 
@@ -13,17 +13,15 @@ use game::structs::ClientActions;
 pub struct WsClient {
 	id: String,
 	validated: bool,
-	client: ws::Sender,
 	sender: mpsc::Sender<GameMessage>,
 	waiting_sender: mpsc::Sender<ClientActions>,
 }
 
 impl WsClient {
-	pub fn new(client: ws::Sender, sender: mpsc::Sender<GameMessage>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
+	pub fn new(sender: mpsc::Sender<GameMessage>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
 		WsClient {
 			id: uuid::Uuid::new_v4().to_simple_string(),
 			validated: false,
-			client: client,
 			sender: sender,
 			waiting_sender: waiting_sender
 		}

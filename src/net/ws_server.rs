@@ -16,13 +16,13 @@ pub fn start(address: &str) {
 	});
 
 	listen(address, |out| {
-		let (tx, rx): (Sender<GameMessage>, Receiver<GameMessage>) = mpsc::channel();
+		let (input_tx, input_rx): (Sender<GameMessage>, Receiver<GameMessage>) = mpsc::channel();
 
-		let ws_client = WsClient::new(out, tx, tx_wq.clone());
+		let ws_client = WsClient::new(input_tx, tx_wq.clone());
 
 		let id = ws_client.get_id();
 
-		let client = GameClient::new(id, rx);
+		let client = GameClient::new(id, out, input_rx);
 
 		tx_wq.send(ClientActions::New(client)).unwrap();
 
