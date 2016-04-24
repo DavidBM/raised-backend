@@ -14,7 +14,7 @@ pub struct Game {
 	players: Vec<Player>
 }
 
-impl Game {
+impl<'a> Game {
 	pub fn new(map: Map) -> Game {
 		Game { map: map, players: Vec::new() }
 	}
@@ -86,11 +86,23 @@ impl Game {
 	fn apply_effects_on_players(&mut self, effects: &Vec<PlayerEffect>) {
 		for effect in effects {
 			let player_id = unwrap_or_return!(effect.get_id(), ());
-			let player_index = unwrap_or_return!(self.players.iter().position(|player| player.id == player_id), ());
-			let player = unwrap_or_return!(self.players.get_mut(player_index), ());
-			player.apply_effect(effect);
+			if let Some(mut player) = self.get_player_by_id(player_id) {
+				player.apply_effect(effect);
+			}
 		}
 	}
+
+	// fn apply_effects_on_playersss(&mut self, effects: &Vec<PlayerEffect>) {
+	// 	for player in &mut self.players {
+	// 		for effect in effects {
+	// 			if let Some(id) = effect.get_id() {
+	// 				if id == player.id {
+	// 					player.apply_effect(effect);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	fn sent_to_players(&mut self, notifications: Vec<PlayerNotification>) {
 		let mut notifications = notifications;
@@ -121,7 +133,9 @@ impl Game {
 		}
 	}
 
-
+	fn get_player_by_id(&'a mut self, id: u64) -> Option<&'a mut Player> {
+		self.players.iter_mut().find(|player| player.id == id)
+	}
 
 	pub fn get_client_id(&self, id: u64) -> Option<String> {
 		for player in &self.players {

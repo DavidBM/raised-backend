@@ -9,6 +9,7 @@ pub enum Message {
 pub struct MessageType {
 	pub t: String,
 }
+
 #[derive(Deserialize, Debug, Clone)]
 pub struct PlayerMove {
 	pub direction: f32,

@@ -1,10 +1,10 @@
-use ws::{listen};
+use ws::listen;
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 use std::thread;
 
 use net::{WsClient, GameClient, Message as GameMessage};
-use game::{WaitingQueue};
+use game::WaitingQueue;
 use game::structs::ClientActions;
 
 pub fn start(address: &str) {
