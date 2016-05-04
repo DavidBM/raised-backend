@@ -1,8 +1,8 @@
-use game::Map;
+use game::World;
 use game::Player;
 use game::PlayerIntention;
 use game::PlayerNotification;
-use game::map::PlayerEffect;
+use game::structs::PlayerEffect;
 use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
@@ -10,12 +10,12 @@ use net::SendMessage;
 
 #[derive(Debug)]
 pub struct Game {
-	map: Map,
+	map: World,
 	players: Vec<Player>
 }
 
 impl<'a> Game {
-	pub fn new(map: Map) -> Game {
+	pub fn new(map: World) -> Game {
 		Game { map: map, players: Vec::new() }
 	}
 
@@ -34,7 +34,7 @@ impl<'a> Game {
 			let duration = (precise_time_ns() - time) as u32;
 
 			if cfg!(debug_assertions){
-				print!("Time ms: {:.5} - Sleep time ms: {:.5}     \x0D", duration, frame_duration as i32 - duration as i32);
+				print!("Time ns: {:.5} - Sleep time ns: {:.5}     \x0D", duration, frame_duration as i32 - duration as i32);
 			}
 
 			sleep(Duration::new(0, frame_duration - duration));
@@ -44,7 +44,6 @@ impl<'a> Game {
 	fn compute(&mut self, elapsed: u32) {
 		let actions = self.process_players_messages(elapsed);
 		let (effects, notifications) = self.process_world(&actions);
-		self.apply_effects_on_players(&effects);
 		self.sent_to_players(notifications);
 		self.delete_players();
 	}
@@ -82,27 +81,6 @@ impl<'a> Game {
 
 		(player_effects, player_notifications)
 	}
-
-	fn apply_effects_on_players(&mut self, effects: &Vec<PlayerEffect>) {
-		for effect in effects {
-			let player_id = unwrap_or_return!(effect.get_id(), ());
-			if let Some(mut player) = self.get_player_by_id(player_id) {
-				player.apply_effect(effect);
-			}
-		}
-	}
-
-	// fn apply_effects_on_playersss(&mut self, effects: &Vec<PlayerEffect>) {
-	// 	for player in &mut self.players {
-	// 		for effect in effects {
-	// 			if let Some(id) = effect.get_id() {
-	// 				if id == player.id {
-	// 					player.apply_effect(effect);
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 
 	fn sent_to_players(&mut self, notifications: Vec<PlayerNotification>) {
 		let mut notifications = notifications;

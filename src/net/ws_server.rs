@@ -3,7 +3,7 @@ use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 use std::thread;
 
-use net::{WsClient, GameClient, Message as GameMessage};
+use net::{WsClient, GameClient, ClientPacket};
 use game::WaitingQueue;
 use game::structs::ClientActions;
 
@@ -16,7 +16,7 @@ pub fn start(address: &str) {
 	});
 
 	listen(address, |out| {
-		let (input_tx, input_rx): (Sender<GameMessage>, Receiver<GameMessage>) = mpsc::channel();
+		let (input_tx, input_rx): (Sender<ClientPacket>, Receiver<ClientPacket>) = mpsc::channel();
 
 		let ws_client = WsClient::new(input_tx, tx_wq.clone());
 

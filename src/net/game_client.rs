@@ -1,22 +1,22 @@
 use std::sync::mpsc;
-use net::Message as GameMessage;
-use net::SendMessage;
+use net::packets::ClientPacket;
+use net::packets::SendMessage;
 use ws::Sender;
 
 #[derive(Debug)]
 pub struct GameClient {
 	id: String,
 	client: Sender,
-	receiver: mpsc::Receiver<GameMessage>
+	receiver: mpsc::Receiver<ClientPacket>
 }
 
 impl GameClient {
-	pub fn new(id: String, client: Sender, receiver: mpsc::Receiver<GameMessage>) -> GameClient {
+	pub fn new(id: String, client: Sender, receiver: mpsc::Receiver<ClientPacket>) -> GameClient {
 		GameClient {id: id, receiver: receiver, client: client}
 	}
 
-	pub fn get_messages(&self) -> Option<Vec<GameMessage>> {
-		let mut messages: Vec<GameMessage> = Vec::new();
+	pub fn get_messages(&self) -> Option<Vec<ClientPacket>> {
+		let mut messages: Vec<ClientPacket> = Vec::new();
 
 		while let Ok(game_message) = self.receiver.try_recv() {
 			messages.push(game_message);
@@ -28,16 +28,6 @@ impl GameClient {
 			None
 		}
 	}
-
-	/*pub fn get_message(&self) -> Option<GameMessage> {
-		let message = self.receiver.try_recv();
-
-		if let Ok(message) = message {
-			Some(message)
-		}else {
-		    None
-		}
-	}*/
 
 	pub fn get_id(&self) -> String {
 		self.id.clone()

@@ -1,0 +1,1 @@
+pub const speed: u32 = 10;

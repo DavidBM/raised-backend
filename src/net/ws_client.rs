@@ -5,7 +5,6 @@ use std::sync::mpsc;
 
 use serde_json;
 use net::*;
-use net::{Message as GameMessage};
 use game::structs::ClientActions;
 
 
@@ -13,12 +12,12 @@ use game::structs::ClientActions;
 pub struct WsClient {
 	id: String,
 	validated: bool,
-	sender: mpsc::Sender<GameMessage>,
+	sender: mpsc::Sender<ClientPacket>,
 	waiting_sender: mpsc::Sender<ClientActions>,
 }
 
 impl WsClient {
-	pub fn new(sender: mpsc::Sender<GameMessage>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
+	pub fn new(sender: mpsc::Sender<ClientPacket>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
 		WsClient {
 			id: uuid::Uuid::new_v4().to_simple_string(),
 			validated: false,
@@ -35,35 +34,54 @@ impl WsClient {
 
 		let text = packet.as_str();
 
-		let decoded: Result<MessageType, _> = serde_json::from_str(text);
+		let decoded: Result<packets::PacketType, _> = serde_json::from_str(text);
 
 		match decoded {
 			Ok(data) => self.extract_data(data, text),
-			Err(_) => println!("Not identify package"),
+			Err(e) => println!("Not identify package {:?}", e),
 		}
 	}
 
-	fn extract_data(&self, message: MessageType, packet: &str) {
+	fn extract_data(&self, message: packets::PacketType, packet: &str) {
 		match message.t.as_ref() {
 			"login" => self.login_message(packet),
 			"move" => self.move_message(packet),
-			_ => println!("Not know message type: {}", message.t)
+			"stay" => self.sender.send(ClientPacket::Stay).unwrap(),
+			"attack" => self.attack_message(packet),
+			"equip" => self.equip_message(packet),
+			_ => println!("Not know message type: {:?}", message)
 		}
 	}
 
 	fn login_message(&self, packet: &str) {
-		let decoded: Result<LoginMessage, _> = serde_json::from_str(packet);
+		let decoded: Result<packets::Login, _> = serde_json::from_str(packet);
 
 		if let Ok(data) = decoded {
-			self.sender.send(GameMessage::LoginMessage(data)).unwrap();
+			self.sender.send(ClientPacket::Login(data)).unwrap();
 		}
 	}
 
 	fn move_message(&self, packet: &str) {
-		let decoded: Result<PlayerMove, _> = serde_json::from_str(packet);
+		let decoded: Result<packets::Move, _> = serde_json::from_str(packet);
 
 		if let Ok(data) = decoded {
-			self.sender.send(GameMessage::PlayerMove(data)).unwrap();
+			self.sender.send(ClientPacket::Move(data)).unwrap();
+		}
+	}
+
+	fn attack_message(&self, packet: &str) {
+		let decoded: Result<packets::Attack, _> = serde_json::from_str(packet);
+
+		if let Ok(data) = decoded {
+			self.sender.send(ClientPacket::Attack(data)).unwrap();
+		}
+	}
+
+	fn equip_message(&self, packet: &str) {
+		let decoded: Result<packets::Equip, _> = serde_json::from_str(packet);
+
+		if let Ok(data) = decoded {
+			self.sender.send(ClientPacket::Equip(data)).unwrap();
 		}
 	}
 }
@@ -87,7 +105,7 @@ impl ws::Handler for WsClient {
 		let action = ClientActions::Delete(self.id.clone());
 		self.waiting_sender.send(action).unwrap();
 
-		self.sender.send(GameMessage::PlayerDisconnected).unwrap();
+		self.sender.send(ClientPacket::Disconnected).unwrap();
 
 		match code {
 			ws::CloseCode::Normal => println!("The client is done with the connection."),
