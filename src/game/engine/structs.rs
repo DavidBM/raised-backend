@@ -21,3 +21,18 @@ pub struct Position {
 	pub y: f32,
 	pub z: f32
 }
+
+#[derive(Debug)]
+pub struct WorldUpdate {
+    pub version: u64
+}
+
+impl WorldUpdate {
+    pub fn new(version: u64) -> WorldUpdate {
+        WorldUpdate {version: version}
+    }
+
+    // pub fn add_path(&self, path: WorldPath) {
+
+    // }
+}
