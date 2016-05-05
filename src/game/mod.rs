@@ -1,5 +1,4 @@
 pub use self::waiting_queue::*;
-pub use self::engine::structs::PlayerNotification;
 pub use self::engine::structs::Position as MapPosition;
 pub use self::engine::world::World;
 pub use self::game::Game;
