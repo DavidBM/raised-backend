@@ -1,24 +1,27 @@
 use game::engine::structs::Position;
-use config::player::speed;
-use std::f32::consts::PI as PIf32;
+use config::player::SPEED;
+use game::Intention;
 
 #[derive(Debug)]
-struct Pj {
-	position: Position
+pub struct Pj {
+	pub id: u64,
+	position: Position,
+	intention: Option<Intention>
 }
 
 impl Pj {
-	fn new() -> Pj {
-		Pj{position: Position{x: 0f32, y: 0f32, z: 0f32}}
+	pub fn new(id: u64) -> Pj {
+		Pj{position: Position{x: 0f32, y: 0f32, z: 0f32}, id: id, intention: None}
 	}
 
-	fn move_direction(&self, direction: f32, elapsed: u32) {
-		let x = self.position.x + direction.cos() * speed as f32 * (elapsed as f32 / 1_000_000_f32);
-		let y = self.position.y + direction.sin() * speed as f32 * (elapsed as f32 / 1_000_000_f32);
-		let mut direction = f32::atan2(y, x);
+	fn get_next_position(&mut self, direction: f32, elapsed: u32) -> Position {
+		let x = self.position.x + direction.cos() * SPEED as f32 * (elapsed as f32 / 1_000_000_f32);
+		let y = self.position.y + direction.sin() * SPEED as f32 * (elapsed as f32 / 1_000_000_f32);
 
-		if direction < 0_f32 {
-			direction += 2_f32 * PIf32;
-		}
+		Position{x: x, y: y, z: self.position.z}
+	}
+
+	pub fn set_players_intention(&mut self, intention: Intention) {
+	    self.intention = Some(intention);
 	}
 }

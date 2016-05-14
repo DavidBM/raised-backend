@@ -1,5 +1,5 @@
 #[derive(Serialize, Debug, Clone)]
-pub enum SendMessage {
+pub enum ServerMessage {
 	PlayerMove {
 		x: f32,
 		y: f32,

@@ -1,5 +1,5 @@
 pub use self::packets::ClientPacket;
-pub use self::packets::SendMessage;
+pub use self::packets::ServerMessage;
 pub use self::ws_client::WsClient;
 pub use self::game_client::GameClient;
 

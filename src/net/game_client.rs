@@ -1,6 +1,6 @@
 use std::sync::mpsc;
 use net::packets::ClientPacket;
-use net::packets::SendMessage;
+use net::packets::ServerMessage;
 use ws::Sender;
 
 #[derive(Debug)]
@@ -33,7 +33,7 @@ impl GameClient {
 		self.id.clone()
 	}
 
-	pub fn send(&self, notification: &SendMessage) {
+	pub fn send(&self, notification: &ServerMessage) {
 		let notification = notification.clone();
 		let result = self.client.send("Hola! :D");
 		match result{

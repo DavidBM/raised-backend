@@ -1,1 +1,1 @@
-pub const speed: u32 = 10;
+pub const SPEED: u32 = 10;

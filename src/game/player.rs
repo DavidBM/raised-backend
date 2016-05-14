@@ -1,42 +1,35 @@
 use net::GameClient as Client;
 use net::ClientPacket;
-use net::SendMessage;
+use net::ServerMessage;
 use net::packets as actions;
-use game::MapPosition;
-use game::structs::PlayerEffect;
 use game::structs::Intention;
 
 #[derive(Debug)]
 pub struct Player {
 	pub id: u64,
 	net: Client,
-	in_game: bool,
 }
 
 impl Player {
 	pub fn new(client: Client, id: u64) -> Player {
-		Player {net: client, id: id, in_game: true}
+		Player {net: client, id: id}
 	}
 
-	pub fn get_actions(&self) -> Option<Vec<ClientPacket>> {
-		self.net.get_messages()
-	}
-
-	pub fn process_message(&self, message: ClientPacket, elapsed: u32) -> Intention{
+	fn get_update(&self, message: ClientPacket) -> Intention{
 		match message {
-			ClientPacket::Move(message) => self.player_move(message, elapsed),
+			ClientPacket::Move(message) => self.player_move(message),
 			ClientPacket::Disconnected => Intention::None,
 			_ => Intention::None,
 		}
 	}
 
-	pub fn process_messages(&self, elapsed: u32) -> Vec<Intention>{
-		let messages = self.get_actions();
+	pub fn get_updates(&self) -> Vec<Intention>{
+		let messages = self.net.get_messages();
 		let mut intentions: Vec<Intention> = Vec::new();
 
 		if let Some(messages) = messages {
 			for message in messages {
-				let player_intention = self.process_message(message, elapsed);
+				let player_intention = self.get_update(message);
 				intentions.push(player_intention);
 			}
 		}
@@ -44,22 +37,18 @@ impl Player {
 		intentions
 	}
 
-	pub fn player_move(&self, action: actions::Move, elapsed: u32) -> Intention {
+	pub fn player_move(&self, action: actions::Move) -> Intention {
 		Intention::Move {
 			player_id: self.id,
 			direction: action.direction
 		}
 	}
 
-	pub fn is_in_game(&self) -> bool {
-		self.in_game
-	}
-
 	pub fn get_client_id(&self) -> String {
 		self.net.get_id()
 	}
 
-	pub fn send(&self, message: &SendMessage) {
+	pub fn send(&self, message: &ServerMessage) {
 		self.net.send(message);
 	}
 }

@@ -1,9 +1,9 @@
 use game::World;
 use game::Player;
-use game::PlayerIntention;
 use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
+use game::engine::pj::Pj;
 
 #[derive(Debug)]
 pub struct Game {
@@ -17,6 +17,7 @@ impl<'a> Game {
 	}
 
 	pub fn add_player(&mut self, player: Player) {
+		self.world.add_player(Pj::new(player.id));
 		self.players.push(player);
 	}
 
@@ -39,22 +40,16 @@ impl<'a> Game {
 	}
 
 	fn compute(&mut self, elapsed: u32) {
-		let world_update = self.world.update(elapsed);
+		self.update_players_updates();
+		self.world.update(elapsed);
 	}
 
-	fn process_players_messages(&self, elapsed: u32) -> Vec<PlayerIntention> {
-		let mut intentions: Vec<PlayerIntention> = Vec::new();
+	fn update_players_updates(&mut self){
 
 		for player in &self.players {
-			let player_intentions = player.process_messages(elapsed);
-			intentions.extend_from_slice(&player_intentions);
+			let updates = player.get_updates();
+			self.world.set_players_intention(player.id, updates);
 		}
-
-		return intentions;
-	}
-
-	fn delete_players(&mut self) {
-		self.players.retain(|player| player.is_in_game());
 	}
 
 	fn get_player_by_id(&'a mut self, id: u64) -> Option<&'a mut Player> {
