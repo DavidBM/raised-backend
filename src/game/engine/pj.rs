@@ -2,7 +2,7 @@ use game::engine::structs::Position;
 use config::player::SPEED;
 use game::Intention;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Pj {
 	pub id: u64,
 	position: Position,
@@ -22,6 +22,6 @@ impl Pj {
 	}
 
 	pub fn set_players_intention(&mut self, intention: Intention) {
-	    self.intention = Some(intention);
+		self.intention = Some(intention);
 	}
 }

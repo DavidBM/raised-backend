@@ -1,6 +1,6 @@
 pub use self::waiting_queue::*;
 pub use self::engine::structs::Position as MapPosition;
-pub use self::engine::world::World;
+pub use self::engine::engine::Runner as Engine;
 pub use self::game::Game;
 pub use self::player::Player;
 pub use self::structs::Intention;

@@ -2,7 +2,6 @@ use std::sync::mpsc::{Receiver};
 use game::structs::ClientActions;
 use net;
 use game::{Game, Player};
-use game::engine::world::World;
 use std::thread;
 use std::u64;
 
@@ -55,8 +54,7 @@ impl WaitingQueue {
 	}
 
 	fn create_game(&mut self) {
-		let map = World::new();
-		let mut game = Game::new(map);
+		let mut game = Game::new();
 
 		for _ in 0..4 {
 			let client = self.clients.remove(0);

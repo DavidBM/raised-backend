@@ -1,41 +1,99 @@
-use game::engine::world_update::*;
+use game::engine::Pj;
 use game::structs::Intention;
-use game::engine::pj::Pj;
+use config::engine::TICK_TIME;
 
 #[derive(Debug)]
-pub struct World {
-	pjs: Vec<Pj>,
-	version: u64
+pub struct WorldHistory {
+	worlds: Vec<World>
 }
 
-impl <'a> World {
-	pub fn new() -> World {
-		World {pjs: Vec::new(), version: 0u64}
+impl WorldHistory {
+	pub fn new(initial_world: World) -> WorldHistory {
+		WorldHistory{worlds: vec![initial_world]}
 	}
 
-	pub fn add_player(&mut self, player: Pj) {
-		self.pjs.push(player);
-	}
+	fn get_at(&self, past_time: u32) -> Option<World> {
+		let iterations = past_time / TICK_TIME;
+		let index = self.worlds.len() as u32 - iterations;
+		let world = self.worlds.get(index as usize);
 
-	pub fn update(&self, elapsed: u32) -> WorldUpdate {
-		let updates = WorldUpdate::new(1u64);
-
-
-
-		updates
-	}
-
-	pub fn set_players_intention(&mut self, player_id: u64, intentions: Vec<Intention>) {
-		let pj = self.get_player_by_id(player_id);
-
-		if let Some(pj) = pj {
-			for intention in intentions {
-				pj.set_players_intention(intention);
-			}
+		match world {
+			Some(world) => Some(world.clone()),
+			None => None,
 		}
 	}
 
-	fn get_player_by_id(&'a mut self, id: u64) -> Option<&'a mut Pj> {
-		self.pjs.iter_mut().find(|pj| pj.id == id)
+	pub fn update(&mut self, update: WorldUpdate) {
+
+		if let Some(mut world) = self.get_actual() {
+
+			let new_world = world.update(update);
+
+			self.add(new_world);
+		}
 	}
+
+	fn get_actual(&self) -> Option<World> {
+		let world = self.worlds.last();
+		match world {
+			Some(world) => Some(world.clone()),
+			None => panic!("No actual world! {:?}", self),
+		}
+	}
+
+	fn add(&mut self, world: World) {
+		self.worlds.push(world);
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct World {
+	players: Vec<Pj>,
+	pub version: u64,
+	pub path: WorldUpdate,
+}
+
+impl World {
+	pub fn new() -> World {
+		World {players: Vec::new(), version: 0u64, path: WorldUpdate::new()}
+	}
+
+	pub fn update(&mut self, update: WorldUpdate) -> World {
+		let mut world = self.clone();
+		world.version += 1;
+
+		for patch in &update.patchs {
+
+		}
+
+		self.path = update;
+
+		return world;
+	}
+
+	fn get_version(version: u64) -> World {
+		unimplemented!();
+	}
+}
+#[derive(Debug, Clone)]
+pub struct WorldUpdate {
+	pub patchs: Vec<WorldPatch>,
+	pub time: u64
+}
+
+impl WorldUpdate {
+	pub fn new () -> WorldUpdate {
+		WorldUpdate {patchs: Vec::new(), time: 0u64}
+	}
+
+	pub fn add_pach(& mut self, patch: WorldPatch) {
+		self.patchs.push(patch);
+	}
+}
+
+
+#[derive(Debug, Clone)]
+pub enum WorldPatch {
+    NewUser (Pj),
+    PlayerIntention {id: u64, intention: Intention}
 }
