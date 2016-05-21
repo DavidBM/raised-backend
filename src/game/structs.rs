@@ -1,10 +1,11 @@
 use net;
+use uuid::Uuid;
 use game::engine::structs::Position;
 
 #[derive(Debug)]
 pub enum ClientActions {
 	New(net::GameClient),
-	Delete(String)
+	Delete(Uuid)
 }
 
 #[derive(Debug, Clone)]

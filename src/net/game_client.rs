@@ -1,3 +1,4 @@
+use uuid::Uuid;
 use std::sync::mpsc;
 use net::packets::ClientPacket;
 use net::packets::ServerMessage;
@@ -5,14 +6,18 @@ use ws::Sender;
 
 #[derive(Debug)]
 pub struct GameClient {
-	id: String,
+	id: Uuid,
 	client: Sender,
 	receiver: mpsc::Receiver<ClientPacket>
 }
 
 impl GameClient {
-	pub fn new(id: String, client: Sender, receiver: mpsc::Receiver<ClientPacket>) -> GameClient {
+	pub fn new(id: Uuid, client: Sender, receiver: mpsc::Receiver<ClientPacket>) -> GameClient {
 		GameClient {id: id, receiver: receiver, client: client}
+	}
+
+	pub fn get_id(&self) -> Uuid {
+		self.id.clone()
 	}
 
 	pub fn get_messages(&self) -> Option<Vec<ClientPacket>> {
@@ -27,10 +32,6 @@ impl GameClient {
 		}else{
 			None
 		}
-	}
-
-	pub fn get_id(&self) -> String {
-		self.id.clone()
 	}
 
 	pub fn send(&self, notification: &ServerMessage) {

@@ -1,3 +1,4 @@
+use uuid::Uuid;
 use net::GameClient as Client;
 use net::ClientPacket;
 use net::ServerMessage;
@@ -44,7 +45,7 @@ impl Player {
 		}
 	}
 
-	pub fn get_client_id(&self) -> String {
+	pub fn get_client_id(&self) -> Uuid {
 		self.net.get_id()
 	}
 

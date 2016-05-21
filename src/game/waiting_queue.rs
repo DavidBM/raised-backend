@@ -1,5 +1,6 @@
 use std::sync::mpsc::{Receiver};
 use game::structs::ClientActions;
+use uuid::Uuid;
 use net;
 use game::{Game, Player};
 use std::thread;
@@ -38,7 +39,7 @@ impl WaitingQueue {
 		self.clients.push(client);
 	}
 
-	pub fn remove_client(&mut self, id: String) {
+	pub fn remove_client(&mut self, id: Uuid) {
 		let index = self.clients.iter().position(|r| r.get_id() == id);
 
 		if let Some(index) = index {

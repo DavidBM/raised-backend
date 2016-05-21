@@ -3,6 +3,7 @@
 #![feature(custom_attribute)]
 
 extern crate ws;
+extern crate uuid;
 extern crate env_logger;
 extern crate serde;
 extern crate serde_json;
@@ -13,6 +14,32 @@ extern crate mac;
 mod game;
 mod net;
 mod config;
+
+use std::sync::mpsc;
+use std::thread;
+use std::sync::mpsc::{Sender, Receiver};
+use game::WaitingQueue;
+use game::structs::ClientActions;
+
+fn main() {
+	let (tx_wq, rx_wq): (Sender<ClientActions>, Receiver<ClientActions>) = mpsc::channel();
+
+	thread::spawn(move || {
+		let mut waiting_queue = WaitingQueue::new(rx_wq);
+		waiting_queue.wait_clients();
+	});
+
+	net::ws_server::start("127.0.0.1:3012", tx_wq);
+}
+
+
+
+
+
+
+
+
+
 
 /*use std::rc::Rc;
 
@@ -31,21 +58,6 @@ struct Test {
 	green_ones: Vec<Rc<Color>>,
 }
 */
-
-
-fn main() {
-	net::ws_server::start("127.0.0.1:3012");
-	//test();
-
-/*	let mut test = Test {field: Vec::new(), red_ones: Vec::new(), blue_ones: Vec::new(), green_ones: Vec::new()};
-
-	let color = Color {red: 255u8, green: 255u8, blue: 255u8};
-	let color = Rc::new(color);
-
-	test.field.push(color.clone());
-	test.red_ones.push(color);*/
-}
-
 
 /*fn main() {
 	//test();

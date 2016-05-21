@@ -1,7 +1,6 @@
-extern crate ws;
-extern crate uuid;
-
 use std::sync::mpsc;
+use ws;
+use uuid::Uuid;
 
 use serde_json;
 use net::*;
@@ -10,23 +9,23 @@ use game::structs::ClientActions;
 
 #[derive(Debug)]
 pub struct WsClient {
-	id: String,
+	id: Uuid,
 	validated: bool,
 	sender: mpsc::Sender<ClientPacket>,
 	waiting_sender: mpsc::Sender<ClientActions>,
 }
 
 impl WsClient {
-	pub fn new(sender: mpsc::Sender<ClientPacket>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
+	pub fn new(id: Uuid, sender: mpsc::Sender<ClientPacket>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
 		WsClient {
-			id: uuid::Uuid::new_v4().to_simple_string(),
+			id: id,
 			validated: false,
 			sender: sender,
 			waiting_sender: waiting_sender
 		}
 	}
 
-	pub fn get_id(&self) -> String {
+	pub fn get_id(&self) -> Uuid {
 		self.id.clone()
 	}
 

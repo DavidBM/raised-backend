@@ -1,30 +1,23 @@
+use uuid;
 use ws::listen;
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
-use std::thread;
 
 use net::{WsClient, GameClient, ClientPacket};
-use game::WaitingQueue;
 use game::structs::ClientActions;
 
-pub fn start(address: &str) {
-	let (tx_wq, rx_wq): (Sender<ClientActions>, Receiver<ClientActions>) = mpsc::channel();
-
-	thread::spawn(move || {
-		let mut waiting_queue = WaitingQueue::new(rx_wq);
-		waiting_queue.wait_clients();
-	});
+pub fn start(address: &str, waiting_queue: Sender<ClientActions>) {
 
 	listen(address, |out| {
 		let (input_tx, input_rx): (Sender<ClientPacket>, Receiver<ClientPacket>) = mpsc::channel();
 
-		let ws_client = WsClient::new(input_tx, tx_wq.clone());
+		let id = uuid::Uuid::new_v4();
 
-		let id = ws_client.get_id();
+		let ws_client = WsClient::new(id.clone() ,input_tx, waiting_queue.clone());
 
 		let client = GameClient::new(id, out, input_rx);
 
-		tx_wq.send(ClientActions::New(client)).unwrap();
+		waiting_queue.send(ClientActions::New(client)).unwrap();
 
 		ws_client
 	}).unwrap()

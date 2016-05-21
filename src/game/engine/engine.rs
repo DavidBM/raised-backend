@@ -1,19 +1,20 @@
 use game::engine::world::{WorldUpdate, WorldHistory, World, WorldPatch};
 use game::structs::Intention;
 use game::engine::pj::Pj;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct Runner {
 	pjs: Vec<Pj>,
 	version: u64,
-	world: WorldHistory,
+	world: Arc<WorldHistory>,
 	patch_buffer: Vec<WorldPatch>
 }
 
 impl <'a> Runner {
 	pub fn new() -> Runner {
 		let initial_world = World::new();
-		let world_history = WorldHistory::new(initial_world);
+		let world_history = Arc::new(WorldHistory::new(initial_world));
 		Runner {pjs: Vec::new(), version: 0u64, world: world_history, patch_buffer: Vec::new()}
 	}
 
