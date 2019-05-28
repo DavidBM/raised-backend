@@ -1,4 +1,4 @@
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum ServerMessage {
 	PlayerMove {
 		x: f32,
@@ -9,7 +9,7 @@ pub enum ServerMessage {
 	},
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PacketType {
 	pub t: String,
 }
@@ -23,23 +23,23 @@ pub enum ClientPacket {
 	Equip(Equip)
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Login {
 	token: String,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Move {
     pub direction: f32
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Attack {
     direction: f32,
     slot: Slot
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Equip {
     item: Item,
     slot: Slot
@@ -47,12 +47,12 @@ pub struct Equip {
 
 /*Helper structs*/
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Slot {
     id: u32
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Item {
     id: u32
 }

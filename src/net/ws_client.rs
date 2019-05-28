@@ -25,9 +25,9 @@ impl WsClient {
 		}
 	}
 
-	pub fn get_id(&self) -> Uuid {
+	/*pub fn get_id(&self) -> Uuid {
 		self.id.clone()
-	}
+	}*/
 
 	pub fn proccess_message(&self, packet: String) {
 
@@ -37,7 +37,7 @@ impl WsClient {
 
 		match decoded {
 			Ok(data) => self.extract_data(data, text),
-			Err(e) => println!("Not identify package {:?}", e),
+			Err(e) => println!("Not identified ws net package {:?}", e),
 		}
 	}
 

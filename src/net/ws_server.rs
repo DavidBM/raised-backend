@@ -8,17 +8,17 @@ use game::structs::ClientActions;
 
 pub fn start(address: &str, waiting_queue: Sender<ClientActions>) {
 
+	println!("Listening webSocket connections");
+
 	listen(address, |out| {
-		let (input_tx, input_rx): (Sender<ClientPacket>, Receiver<ClientPacket>) = mpsc::channel();
+		let (packer_sender, packet_receiver): (Sender<ClientPacket>, Receiver<ClientPacket>) = mpsc::channel();
 
 		let id = uuid::Uuid::new_v4();
 
-		let ws_client = WsClient::new(id.clone() ,input_tx, waiting_queue.clone());
-
-		let client = GameClient::new(id, out, input_rx);
+		let client = GameClient::new(id, out, packet_receiver);
 
 		waiting_queue.send(ClientActions::New(client)).unwrap();
 
-		ws_client
+		WsClient::new(id.clone() ,packer_sender, waiting_queue.clone())
 	}).unwrap()
 }

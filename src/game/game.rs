@@ -31,10 +31,12 @@ impl<'a> Game {
 			let duration = (precise_time_ns() - time) as u32;
 
 			if cfg!(debug_assertions){
-				print!("Time ns: {:.5} - Sleep time ns: {:.5}     \x0D", duration, TICK_TIME as i32 - duration as i32);
+				print!("Tick time ns: {:.5} - Sleep time ns: {:.5}     \x0D", duration, TICK_TIME as i32 - duration as i32);
 			}
 
-			sleep(Duration::new(0, TICK_TIME - duration));
+			if duration < TICK_TIME {
+				sleep(Duration::new(0, TICK_TIME - duration));
+			}
 		}
 	}
 
