@@ -1,6 +1,4 @@
 #![feature(proc_macro)]
-#![feature(custom_derive)]
-
 #![feature(plugin)]
 
 extern crate ws;

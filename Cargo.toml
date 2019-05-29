@@ -1,10 +1,11 @@
 [package]
-name = "rust-ws-test"
+name = "raised-server"
 version = "0.1.0"
 authors = ["David Bonet <webbonet@gmail.com>"]
+edition = "2018"
 
 [dependencies]
-ws = "^0.5"
+ws = "^0.8"
 time = "^0.1"
 env_logger = "^0.3"
 uuid = { version = "0.3", features = ["serde", "v4"] }
