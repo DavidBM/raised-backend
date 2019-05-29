@@ -1,8 +1,8 @@
 use std::sync::mpsc::{Receiver};
-use game::structs::ClientActions;
+use crate::game::structs::ClientActions;
 use uuid::Uuid;
-use net;
-use game::{Game, Player};
+use crate::net;
+use crate::game::{Game, Player};
 use std::thread;
 use std::u64;
 

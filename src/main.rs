@@ -15,8 +15,8 @@ mod config;
 
 use std::thread;
 use std::sync::mpsc::{Sender, Receiver, channel as Channel};
-use game::WaitingQueue;
-use game::structs::ClientActions;
+use crate::game::WaitingQueue;
+use crate::game::structs::ClientActions;
 
 fn main() {
 	println!("Starting server...");

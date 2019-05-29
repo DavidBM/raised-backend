@@ -1,6 +1,6 @@
-use game::engine::world::{WorldUpdate, WorldHistory, World, WorldPatch};
-use game::structs::Intention;
-use game::engine::pj::Pj;
+use crate::game::engine::world::{WorldUpdate, WorldHistory, World, WorldPatch};
+use crate::game::structs::Intention;
+use crate::game::engine::pj::Pj;
 use std::sync::Arc;
 
 #[derive(Debug)]
@@ -18,7 +18,7 @@ impl <'a> Runner {
 		Runner {pjs: Vec::new(), version: 0u64, world: world_history, patch_buffer: Vec::new()}
 	}
 
-	pub fn update(&self, elapsed: u32) -> WorldUpdate {
+	pub fn update(&self, _elapsed: u32) -> WorldUpdate {
 		let updates = WorldUpdate::new();
 		//Get intentions
 		//Execute updates

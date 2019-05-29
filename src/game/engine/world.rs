@@ -1,6 +1,6 @@
-use game::engine::Pj;
-use game::structs::Intention;
-use config::engine::TICK_TIME;
+use crate::game::engine::Pj;
+use crate::game::structs::Intention;
+use crate::config::engine::TICK_TIME;
 
 #[derive(Debug)]
 pub struct WorldHistory {
@@ -62,7 +62,7 @@ impl World {
 		let mut world = self.clone();
 		world.version += 1;
 
-		for patch in &update.patchs {
+		for _patch in &update.patchs {
 
 		}
 
@@ -71,7 +71,7 @@ impl World {
 		return world;
 	}
 
-	fn get_version(version: u64) -> World {
+	fn get_version(_version: u64) -> World {
 		unimplemented!();
 	}
 }

@@ -1,7 +1,7 @@
 use uuid::Uuid;
 use std::sync::mpsc;
-use net::packets::ClientPacket;
-use net::packets::ServerMessage;
+use crate::net::packets::ClientPacket;
+use crate::net::packets::ServerMessage;
 use ws::Sender;
 
 #[derive(Debug)]

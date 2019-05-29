@@ -3,8 +3,8 @@ use ws;
 use uuid::Uuid;
 
 use serde_json;
-use net::*;
-use game::structs::ClientActions;
+use crate::net::*;
+use crate::game::structs::ClientActions;
 
 
 #[derive(Debug)]

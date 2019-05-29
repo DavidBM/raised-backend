@@ -1,6 +1,6 @@
-use game::engine::structs::Position;
-use config::player::SPEED;
-use game::Intention;
+use crate::game::engine::structs::Position;
+use crate::config::player::SPEED;
+use crate::game::Intention;
 
 #[derive(Debug, Clone)]
 pub struct Pj {

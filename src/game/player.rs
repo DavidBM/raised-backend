@@ -1,9 +1,9 @@
 use uuid::Uuid;
-use net::GameClient as Client;
-use net::ClientPacket;
-use net::ServerMessage;
-use net::packets as actions;
-use game::structs::Intention;
+use crate::net::GameClient as Client;
+use crate::net::ClientPacket;
+use crate::net::ServerMessage;
+use crate::net::packets as actions;
+use crate::game::structs::Intention;
 
 #[derive(Debug)]
 pub struct Player {

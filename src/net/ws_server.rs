@@ -3,8 +3,8 @@ use ws::listen;
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 
-use net::{WsClient, GameClient, ClientPacket};
-use game::structs::ClientActions;
+use crate::net::{WsClient, GameClient, ClientPacket};
+use crate::game::structs::ClientActions;
 
 pub fn start(address: &str, waiting_queue: Sender<ClientActions>) {
 

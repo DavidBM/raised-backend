@@ -1,6 +1,6 @@
-use net;
+use crate::net;
 use uuid::Uuid;
-use game::engine::structs::Position;
+use crate::game::engine::structs::Position;
 
 #[derive(Debug)]
 pub enum ClientActions {

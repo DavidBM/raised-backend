@@ -1,10 +1,10 @@
-use game::Engine;
-use game::Player;
+use crate::game::Engine;
+use crate::game::Player;
 use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
-use game::engine::pj::Pj;
-use config::engine::TICK_TIME;
+use crate::game::engine::pj::Pj;
+use crate::config::engine::TICK_TIME;
 
 #[derive(Debug)]
 pub struct Game {
