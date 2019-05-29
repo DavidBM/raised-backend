@@ -1,6 +1,3 @@
-#![feature(proc_macro)]
-#![feature(plugin)]
-
 extern crate ws;
 extern crate uuid;
 extern crate env_logger;
