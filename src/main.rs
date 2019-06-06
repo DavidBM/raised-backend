@@ -5,8 +5,6 @@ extern crate serde;
 extern crate serde_json;
 extern crate time;
 #[macro_use]
-extern crate mac;
-#[macro_use]
 extern crate serde_derive;
 
 mod game;

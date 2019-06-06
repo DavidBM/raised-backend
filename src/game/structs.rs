@@ -2,6 +2,8 @@ use crate::net;
 use uuid::Uuid;
 use crate::game::engine::structs::Position;
 
+
+
 #[derive(Debug)]
 pub enum ClientActions {
 	New(net::GameClient),
@@ -9,26 +11,44 @@ pub enum ClientActions {
 }
 
 #[derive(Debug, Clone)]
-pub enum PlayerEffect {
-	Position {
-		player_id: u64,
-		position: Position
-	}
-}
-
-impl PlayerEffect {
-	pub fn get_id(&self) -> Option<u64> {
-		match self {
-			&PlayerEffect::Position{player_id, ..} => Some(player_id),
-		}
-	}
-}
+pub struct PlayerIntention {
+	pub player_id: u64,
+	pub intention: Intention
+} 
 
 #[derive(Debug, Clone)]
 pub enum Intention {
 	Move {
-		player_id: u64,
 		direction: f32,
 	},
+	ConnectPlayer,
+	DisconnectPlayer,
 	None
 }
+
+#[derive(Debug, Clone)]
+pub struct IntentionEffect {
+	intention: Intention,
+	effect: Effect,
+}
+
+#[derive(Debug, Clone)]
+pub enum Effect {
+	PlayerMoved {
+		player_id: u64,
+		position: Position
+	},
+	PlayerConnected(u64),
+	PlayerDiconnected(u64)
+}
+
+impl Effect {
+	pub fn get_id(&self) -> Option<u64> {
+		match self {
+			&Effect::PlayerMoved{player_id, ..} => Some(player_id),
+			&Effect::PlayerConnected(player_id) => Some(player_id),
+			&Effect::PlayerDiconnected(player_id) => Some(player_id),
+		}
+	}
+}
+

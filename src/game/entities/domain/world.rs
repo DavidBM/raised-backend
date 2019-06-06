@@ -1,5 +1,6 @@
-use crate::game::engine::Pj;
-use crate::game::structs::Intention;
+use game::structs::IntentionEffect;
+use crate::game::entities::domain::Pj;
+
 use crate::config::engine::TICK_TIME;
 
 #[derive(Debug)]
@@ -71,13 +72,13 @@ impl World {
 		return world;
 	}
 
-	fn get_version(_version: u64) -> World {
-		unimplemented!();
+	fn get_version(&self, _version: u64) -> u64 {
+		self.version
 	}
 }
 #[derive(Debug, Clone)]
 pub struct WorldUpdate {
-	pub patchs: Vec<WorldPatch>,
+	pub patchs: Vec<IntentionEffect>,
 	pub time: u64
 }
 
@@ -86,7 +87,7 @@ impl WorldUpdate {
 		WorldUpdate {patchs: Vec::new(), time: 0u64}
 	}
 
-	pub fn add_pach(& mut self, patch: WorldPatch) {
+	pub fn add_pach(& mut self, patch: IntentionEffect) {
 		self.patchs.push(patch);
 	}
 }
@@ -95,5 +96,5 @@ impl WorldUpdate {
 #[derive(Debug, Clone)]
 pub enum WorldPatch {
     NewUser (Pj),
-    PlayerIntention {id: u64, intention: Intention}
+    PlayerIntention {id: u64, intention: IntentionEffect}
 }

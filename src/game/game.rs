@@ -3,7 +3,6 @@ use crate::game::Player;
 use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
-use crate::game::engine::pj::Pj;
 use crate::config::engine::TICK_TIME;
 
 #[derive(Debug)]
@@ -18,7 +17,7 @@ impl<'a> Game {
 	}
 
 	pub fn add_player(&mut self, player: Player) {
-		self.runner.add_player(Pj::new(player.id));
+		self.runner.add_player(player.id);
 		self.players.push(player);
 	}
 
@@ -49,7 +48,7 @@ impl<'a> Game {
 
 		for player in &self.players {
 			let updates = player.get_updates();
-			self.runner.set_players_intention(player.id, updates);
+			self.runner.set_players_intention(updates);
 		}
 	}
 

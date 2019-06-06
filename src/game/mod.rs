@@ -8,5 +8,6 @@ pub use self::structs::Intention;
 mod waiting_queue;
 mod game;
 mod engine;
+pub mod entities;
 mod player;
 pub mod structs;
