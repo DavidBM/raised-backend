@@ -8,7 +8,7 @@ use crate::game::entities::System;
 pub struct PjMovement;
 
 impl System for PjMovement {
-	fn execute_tick(&mut self, hola: &WorldHistory, _intention: Vec<PlayerIntention>) -> IntentionEffect {
+	fn execute_tick(&mut self, _hola: &WorldHistory, _intention: Vec<PlayerIntention>) -> IntentionEffect {
 		unimplemented!();
 	}
 }
