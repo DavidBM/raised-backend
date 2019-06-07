@@ -3,7 +3,6 @@ use game::entities::domain::pj::Pj;
 use config::player::SPEED;
 use game::engine::structs::Position;
 use game::entities::domain::world::WorldHistory;
-use game::structs::PlayerIntention;
 use crate::game::entities::System;
 
 
