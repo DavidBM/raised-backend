@@ -1,8 +1,6 @@
 use game::structs::Effect;
 use crate::game::entities::domain::Pj;
 
-use crate::config::engine::TICK_TIME;
-
 #[derive(Debug)]
 pub struct WorldHistory {
 	worlds: Vec<World>
@@ -11,17 +9,6 @@ pub struct WorldHistory {
 impl WorldHistory {
 	pub fn new(initial_world: World) -> WorldHistory {
 		WorldHistory{worlds: vec![initial_world]}
-	}
-
-	fn get_at(&self, past_time: u32) -> Option<World> {
-		let iterations = past_time / TICK_TIME;
-		let index = self.worlds.len() as u32 - iterations;
-		let world = self.worlds.get(index as usize);
-
-		match world {
-			Some(world) => Some(world.clone()),
-			None => None,
-		}
 	}
 
 	pub fn update(&mut self, update: WorldUpdate) {
@@ -72,10 +59,11 @@ impl World {
 		return world;
 	}
 
-	fn get_version(&self, _version: u64) -> u64 {
-		self.version
+	pub fn apply_to_player(&mut self, _player_id: Pj /*missing callback*/) {
+		unimplemented!()
 	}
 }
+
 #[derive(Debug, Clone)]
 pub struct WorldUpdate {
 	pub patchs: Vec<Effect>,

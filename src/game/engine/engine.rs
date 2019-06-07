@@ -1,3 +1,4 @@
+use game::structs::Effect;
 use game::engine::structs::Position;
 use game::entities::domain::pj::Pj;
 use std::sync::RwLock;
@@ -5,13 +6,17 @@ use game::structs::PlayerIntention;
 use crate::game::entities::domain::world::{WorldUpdate, WorldHistory, World};
 use crate::game::entities::{PjMovement, System};
 use std::sync::Arc;
+use std::thread;
+use std::sync::mpsc::{Sender, channel, Receiver};
 
 #[derive(Debug)]
 pub struct Runner {
 	version: u64,
 	world: Arc<RwLock<WorldHistory>>,
 	player_intention_buffer: Vec<PlayerIntention>,
-	systems: Vec<Box<dyn System>>
+	systems: Vec<Box<dyn System>>,
+	systems_senders: Vec<Sender<Arc<RwLock<WorldHistory>>>>,
+	systems_receivers: Vec<Receiver<Vec<Effect>>>,
 }
 
 impl <'a> Runner {
@@ -23,7 +28,9 @@ impl <'a> Runner {
 			version: 0u64, 
 			world: world_history, 
 			player_intention_buffer: Vec::new(),
-			systems: Vec::new()
+			systems: Vec::new(),
+			systems_receivers: Vec::new(),
+			systems_senders: Vec::new(),
 		};
 
 		runner.add_system(Box::new(PjMovement {}));
@@ -31,29 +38,33 @@ impl <'a> Runner {
 		runner
 	}
 
-	fn add_system(&mut self, system: Box<dyn System>) {
-		self.systems.push(system);
+	fn add_system(&mut self, mut system: Box<dyn System>) {
+		let (sender, receiver) = channel::<Vec<Effect>>();
+		let (go_sender, go_receiver) = channel::<Arc<RwLock<WorldHistory>>>();
+
+		self.systems_senders.push(go_sender);
+		self.systems_receivers.push(receiver);
+
+		thread::spawn(move || {
+			loop {
+				let world = go_receiver.recv().unwrap();
+
+				let effects = system.execute_tick(&world.read().unwrap());
+
+				sender.send(effects).unwrap();
+			}
+		});
 	}
 
-	pub fn update(&mut self, _elapsed: u32) -> WorldUpdate {
-		let mut updates = WorldUpdate::new();
+	pub fn update(&mut self, elapsed: u32) -> WorldUpdate {
 
 		self.set_player_intentions_in_world();
 
-		for system in self.systems.iter_mut() {
-			let world_history = self.world.clone();
-			//In order to do the threads we need to make then to send messages to a channel.
-			//Provably we shouldn't spanw the threads from there, but in the "add_system" call.
-			let effects = system.execute_tick(&world_history.read().unwrap());
+		let update = self.execute_systems(elapsed);
 
-			for effect in effects {
-				updates.add_pach(effect);
-			}
-		}
+		self.apply_effects(&mut self.world.write().unwrap(), &update);
 
-		self.world.write().unwrap().update(updates.clone());
-
-		updates
+		update
 	}
 
 	fn set_player_intentions_in_world(&mut self) {
@@ -71,6 +82,33 @@ impl <'a> Runner {
 				if player.id == intention.player_id {
 					player.intention = Some(intention.intention.clone());
 				}
+			}
+		}
+	}
+
+	fn execute_systems(&mut self, _elapsed: u32) -> WorldUpdate {
+		let mut updates = WorldUpdate::new();
+		
+		for sender in self.systems_senders.iter() {
+			sender.send(self.world.clone()).unwrap();
+		}
+
+		for receivers in self.systems_receivers.iter() {
+			let effects = receivers.recv().unwrap();
+		
+			for effect in effects {
+				updates.add_pach(effect);
+			}
+		}
+
+		updates
+	}
+
+	fn apply_effects(&self, _world: &mut WorldHistory, updates: &WorldUpdate) {
+		for update in updates.patchs.iter() {
+			match update {
+				Effect::PlayerMoved{..} => (),
+				_ => (),
 			}
 		}
 	}
