@@ -1,4 +1,4 @@
-use game::structs::IntentionEffect;
+use game::structs::Effect;
 use crate::game::entities::domain::Pj;
 
 use crate::config::engine::TICK_TIME;
@@ -26,7 +26,7 @@ impl WorldHistory {
 
 	pub fn update(&mut self, update: WorldUpdate) {
 
-		if let Some(mut world) = self.get_actual() {
+		if let Some(mut world) = self.get_current() {
 
 			let new_world = world.update(update);
 
@@ -34,7 +34,7 @@ impl WorldHistory {
 		}
 	}
 
-	fn get_actual(&self) -> Option<World> {
+	pub fn get_current(&self) -> Option<World> {
 		let world = self.worlds.last();
 		match world {
 			Some(world) => Some(world.clone()),
@@ -49,7 +49,7 @@ impl WorldHistory {
 
 #[derive(Debug, Clone)]
 pub struct World {
-	players: Vec<Pj>,
+	pub players: Vec<Pj>,
 	pub version: u64,
 	pub path: WorldUpdate,
 }
@@ -78,7 +78,7 @@ impl World {
 }
 #[derive(Debug, Clone)]
 pub struct WorldUpdate {
-	pub patchs: Vec<IntentionEffect>,
+	pub patchs: Vec<Effect>,
 	pub time: u64
 }
 
@@ -87,14 +87,7 @@ impl WorldUpdate {
 		WorldUpdate {patchs: Vec::new(), time: 0u64}
 	}
 
-	pub fn add_pach(& mut self, patch: IntentionEffect) {
+	pub fn add_pach(& mut self, patch: Effect) {
 		self.patchs.push(patch);
 	}
-}
-
-
-#[derive(Debug, Clone)]
-pub enum WorldPatch {
-    NewUser (Pj),
-    PlayerIntention {id: u64, intention: IntentionEffect}
 }

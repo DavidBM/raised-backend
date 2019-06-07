@@ -27,12 +27,6 @@ pub enum Intention {
 }
 
 #[derive(Debug, Clone)]
-pub struct IntentionEffect {
-	intention: Intention,
-	effect: Effect,
-}
-
-#[derive(Debug, Clone)]
 pub enum Effect {
 	PlayerMoved {
 		player_id: u64,
