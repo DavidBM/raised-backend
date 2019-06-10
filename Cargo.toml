@@ -2,7 +2,7 @@
 name = "raised-server"
 version = "0.1.0"
 authors = ["David Bonet <webbonet@gmail.com>"]
-release = "2018"
+edition = "2018"
 
 [dependencies]
 ws = "^0.8"
