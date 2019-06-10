@@ -1,4 +1,4 @@
-use game::structs::Effect;
+use crate::game::structs::Effect;
 use crate::game::entities::domain::Pj;
 
 #[derive(Debug)]

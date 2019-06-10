@@ -1,8 +1,8 @@
-use game::structs::{Effect, Intention};
-use game::entities::domain::pj::Pj;
-use config::player::SPEED;
-use game::engine::structs::Position;
-use game::entities::domain::world::WorldHistory;
+use crate::game::structs::{Effect, Intention};
+use crate::game::entities::domain::pj::Pj;
+use crate::config::player::SPEED;
+use crate::game::engine::structs::Position;
+use crate::game::entities::domain::world::WorldHistory;
 use crate::game::entities::System;
 
 

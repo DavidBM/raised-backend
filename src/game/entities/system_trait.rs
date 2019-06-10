@@ -1,5 +1,5 @@
-use game::entities::domain::world::WorldHistory;
-use game::structs::Effect;
+use crate::game::entities::domain::world::WorldHistory;
+use crate::game::structs::Effect;
 use std::fmt::Debug;
 
 

@@ -1,4 +1,4 @@
-use game::structs::PlayerIntention;
+use crate::game::structs::PlayerIntention;
 use uuid::Uuid;
 use crate::net::GameClient as Client;
 use crate::net::ClientPacket;

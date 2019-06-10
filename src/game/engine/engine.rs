@@ -1,8 +1,8 @@
-use game::structs::Effect;
-use game::engine::structs::Position;
-use game::entities::domain::pj::Pj;
+use crate::game::structs::Effect;
+use crate::game::engine::structs::Position;
+use crate::game::entities::domain::pj::Pj;
 use std::sync::RwLock;
-use game::structs::PlayerIntention;
+use crate::game::structs::PlayerIntention;
 use crate::game::entities::domain::world::{WorldUpdate, WorldHistory, World};
 use crate::game::entities::{PjMovement, System};
 use std::sync::Arc;
