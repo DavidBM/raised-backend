@@ -70,12 +70,7 @@ impl <'a> Runner {
 	fn set_player_intentions_in_world(&mut self) {
 		let world = self.world.write().unwrap();
 
-		let world = world.get_current();
-
-		let mut world = match world {
-			Some(world) => world,
-			None => return (),
-		};
+		let mut world = world.get_current();
 
 		for intention in &self.player_intention_buffer {
 			for player in world.players.iter_mut() {
@@ -105,23 +100,27 @@ impl <'a> Runner {
 	}
 
 	fn apply_effects(&self, _world: &mut WorldHistory, updates: &WorldUpdate) {
+		let mut world_history = self.world.write().unwrap();
+		let mut world = world_history.get_current();
+
 		for update in updates.patchs.iter() {
 			match update {
-				Effect::PlayerMoved{..} => (),
+				Effect::PlayerMoved{player_id, position} => world.apply_to_player(player_id, |player: &mut Pj| {
+					player.position = position.clone();
+				} ),
 				_ => (),
 			}
 		}
+
+		world.version += 1;
+
+		world_history.update(world);
 	}
 
 	pub fn add_player(&mut self, player_id: u64) {
 		let world = self.world.write().unwrap();
 
-		let world = world.get_current();
-
-		let mut world = match world {
-			Some(world) => world,
-			None => return (),
-		};
+		let mut world = world.get_current();
 
 		world.players.push(Pj {id: player_id, position: Position {x: 0.0, y: 0.0, z: 0.0}, intention: None});
 	}

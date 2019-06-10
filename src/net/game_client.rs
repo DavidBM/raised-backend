@@ -1,7 +1,8 @@
+use crate::game::structs::Effect;
 use uuid::Uuid;
 use std::sync::mpsc;
 use crate::net::packets::ClientPacket;
-use crate::net::packets::ServerMessage;
+
 use ws::Sender;
 
 #[derive(Debug)]
@@ -34,8 +35,7 @@ impl GameClient {
 		}
 	}
 
-	pub fn send(&self, notification: &ServerMessage) {
-		let notification = notification.clone();
+	pub fn send(&self, notification: &Effect) {
 		let result = self.client.send("Hola! :D");
 		match result{
 			Ok(_) => println!("Message send: {:?}", notification),

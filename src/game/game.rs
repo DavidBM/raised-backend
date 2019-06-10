@@ -4,6 +4,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
 use crate::config::engine::TICK_TIME;
+use crate::game::structs::Effect;
 
 #[derive(Debug)]
 pub struct Game {
@@ -41,7 +42,22 @@ impl<'a> Game {
 
 	fn compute(&mut self, elapsed: u32) {
 		self.update_players_updates();
-		self.runner.update(elapsed);
+		let updates = self.runner.update(elapsed);
+
+		for update in updates.patchs {
+			match update {
+				Effect::PlayerMoved {player_id, position: _} => {
+					let player = self.get_player_by_id(player_id);
+						match player {
+							Some(player) => player.send(&update),
+							None => (),
+						}
+
+					()
+				},
+				_ => ()
+			}
+		}		
 	}
 
 	fn update_players_updates(&mut self){

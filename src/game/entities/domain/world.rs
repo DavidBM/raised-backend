@@ -11,25 +11,15 @@ impl WorldHistory {
 		WorldHistory{worlds: vec![initial_world]}
 	}
 
-	pub fn update(&mut self, update: WorldUpdate) {
-
-		if let Some(mut world) = self.get_current() {
-
-			let new_world = world.update(update);
-
-			self.add(new_world);
-		}
-	}
-
-	pub fn get_current(&self) -> Option<World> {
+	pub fn get_current(&self) -> World {
 		let world = self.worlds.last();
 		match world {
-			Some(world) => Some(world.clone()),
+			Some(world) => world.clone(),
 			None => panic!("No actual world! {:?}", self),
 		}
 	}
 
-	fn add(&mut self, world: World) {
+	pub fn update(&mut self, world: World) {
 		self.worlds.push(world);
 	}
 }
@@ -46,21 +36,13 @@ impl World {
 		World {players: Vec::new(), version: 0u64, path: WorldUpdate::new()}
 	}
 
-	pub fn update(&mut self, update: WorldUpdate) -> World {
-		let mut world = self.clone();
-		world.version += 1;
+	pub fn apply_to_player(&mut self, player_id: &u64, callback: impl Fn(&mut Pj) -> ()) {
+		let player = self.players.iter_mut().find(|pj| { pj.id == *player_id });
 
-		for _patch in &update.patchs {
-
+		match player {
+			Some(player) => callback(player),
+			None => (),
 		}
-
-		self.path = update;
-
-		return world;
-	}
-
-	pub fn apply_to_player(&mut self, _player_id: Pj /*missing callback*/) {
-		unimplemented!()
 	}
 }
 

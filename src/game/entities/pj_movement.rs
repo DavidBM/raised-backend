@@ -23,11 +23,6 @@ impl System for PjMovement {
 		let world = world.get_current();
 		let mut players_positions: Vec<Effect> = Vec::new();
 
-		let world = match world {
-			Some(world) => world,
-			None => return Vec::new(),
-		};
-
 		for player in &world.players {
 
 			let intention = match &player.intention {
