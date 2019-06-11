@@ -44,26 +44,28 @@ impl<'a> Game {
 		self.update_players_updates();
 		let updates = self.runner.update(elapsed);
 
+		println!("World updated {:?}", updates);
+
 		for update in updates.patchs {
 			match update {
-				Effect::PlayerMoved {player_id, position: _} => {
+				Effect::PlayerMoved {player_id, ..}=> {
 					let player = self.get_player_by_id(player_id);
 						match player {
 							Some(player) => player.send(&update),
 							None => (),
 						}
-
 					()
 				},
 				_ => ()
 			}
-		}		
+		}
 	}
 
 	fn update_players_updates(&mut self){
 
 		for player in &self.players {
 			let updates = player.get_updates();
+			println!("Player updates: {:?}", updates);
 			self.runner.set_players_intention(updates);
 		}
 	}

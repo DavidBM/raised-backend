@@ -20,7 +20,7 @@ impl PjMovement {
 
 impl System for PjMovement {
 	fn execute_tick(&mut self, world: &WorldHistory) -> Vec<Effect> {
-		let world = world.get_current();
+		let world = world.get_current_inmutable();
 		let mut players_positions: Vec<Effect> = Vec::new();
 
 		for player in &world.players {
@@ -29,7 +29,7 @@ impl System for PjMovement {
 				Some(intention) => intention,
 				None => continue,
 			};
-
+			println!("Intetion {:?}", intention);
 			match intention {
 				Intention::Move{direction} => players_positions.push(Effect::PlayerMoved {
 					player_id: player.id,

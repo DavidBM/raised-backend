@@ -49,7 +49,11 @@ impl <'a> Runner {
 			loop {
 				let world = go_receiver.recv().unwrap();
 
-				let effects = system.execute_tick(&world.read().unwrap());
+				let read_lock_world = world.read().expect("Cannot get world read lock for executing service");
+
+				let effects = system.execute_tick(&read_lock_world);
+
+				drop(read_lock_world);
 
 				sender.send(effects).unwrap();
 			}
@@ -68,9 +72,11 @@ impl <'a> Runner {
 	}
 
 	fn set_player_intentions_in_world(&mut self) {
-		let world = self.world.write().unwrap();
+		let mut world = self.world.write().unwrap();
 
 		let mut world = world.get_current();
+
+		let world = Arc::get_mut(&mut world).unwrap();
 
 		for intention in &self.player_intention_buffer {
 			for player in world.players.iter_mut() {
@@ -99,9 +105,8 @@ impl <'a> Runner {
 		updates
 	}
 
-	fn apply_effects(&self, _world: &mut WorldHistory, updates: &WorldUpdate) {
-		let mut world_history = self.world.write().unwrap();
-		let mut world = world_history.get_current();
+	fn apply_effects(&self, world_history: &mut WorldHistory, updates: &WorldUpdate) {
+		let mut world = (*world_history.get_current()).clone();
 
 		for update in updates.patchs.iter() {
 			match update {
@@ -118,11 +123,15 @@ impl <'a> Runner {
 	}
 
 	pub fn add_player(&mut self, player_id: u64) {
-		let world = self.world.write().unwrap();
+		let mut world = self.world.write().unwrap();
 
 		let mut world = world.get_current();
 
+		let world = Arc::get_mut(&mut world).unwrap();
+
 		world.players.push(Pj {id: player_id, position: Position {x: 0.0, y: 0.0, z: 0.0}, intention: None});
+
+		drop(world);
 	}
 
 	pub fn set_players_intention(&mut self, intentions: Vec<PlayerIntention>) {
