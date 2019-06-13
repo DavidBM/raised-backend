@@ -5,5 +5,5 @@ use crate::game::Intention;
 pub struct Pj {
 	pub id: u64,
 	pub position: Position,
-	pub intention: Option<Intention>
+	pub intention: Vec<Intention>
 }

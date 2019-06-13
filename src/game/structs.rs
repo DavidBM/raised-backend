@@ -26,7 +26,7 @@ pub enum Intention {
 	None
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum Effect {
 	PlayerMoved {
 		player_id: u64,

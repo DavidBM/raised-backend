@@ -1,18 +1,19 @@
+use std::sync::RwLock;
 use std::sync::Arc;
 use crate::game::structs::Effect;
 use crate::game::entities::domain::Pj;
 
 #[derive(Debug)]
 pub struct WorldHistory {
-	worlds: Vec<Arc<World>>
+	worlds: Vec<Arc<RwLock<World>>>
 }
 
 impl WorldHistory {
 	pub fn new(initial_world: World) -> WorldHistory {
-		WorldHistory{worlds: vec![Arc::new(initial_world)]}
+		WorldHistory{worlds: vec![Arc::new(RwLock::new(initial_world))]}
 	}
 
-	pub fn get_current(&mut self) -> Arc<World> {
+	pub fn get_current(&mut self) -> Arc<RwLock<World>> {
 		let world = self.worlds.last_mut();
 
 		match world {
@@ -21,7 +22,7 @@ impl WorldHistory {
 		}
 	}
 
-	pub fn get_current_inmutable(&self) -> Arc<World> {
+	pub fn get_current_inmutable(&self) -> Arc<RwLock<World>> {
 		let world = self.worlds.last();
 
 		match world {
@@ -31,7 +32,7 @@ impl WorldHistory {
 	}
 
 	pub fn update(&mut self, world: World) {
-		self.worlds.push(Arc::new(world));
+		self.worlds.push(Arc::new(RwLock::new(world)));
 	}
 }
 

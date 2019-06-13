@@ -1,10 +1,10 @@
-use crate::game::structs::Effect;
+use crate::game::structs::{Effect, Intention};
 use crate::game::engine::structs::Position;
 use crate::game::entities::domain::pj::Pj;
 use std::sync::RwLock;
 use crate::game::structs::PlayerIntention;
 use crate::game::entities::domain::world::{WorldUpdate, WorldHistory, World};
-use crate::game::entities::{PjMovement, System};
+use crate::game::entities::{PjMovement, System, PjConnection};
 use std::sync::Arc;
 use std::thread;
 use std::sync::mpsc::{Sender, channel, Receiver};
@@ -15,7 +15,7 @@ pub struct Runner {
 	world: Arc<RwLock<WorldHistory>>,
 	player_intention_buffer: Vec<PlayerIntention>,
 	systems: Vec<Box<dyn System>>,
-	systems_senders: Vec<Sender<Arc<RwLock<WorldHistory>>>>,
+	systems_senders: Vec<Sender<(Arc<RwLock<WorldHistory>>, u32)>>,
 	systems_receivers: Vec<Receiver<Vec<Effect>>>,
 }
 
@@ -34,26 +34,27 @@ impl <'a> Runner {
 		};
 
 		runner.add_system(Box::new(PjMovement {}));
+		runner.add_system(Box::new(PjConnection {}));
 
 		runner
 	}
 
 	fn add_system(&mut self, mut system: Box<dyn System>) {
 		let (sender, receiver) = channel::<Vec<Effect>>();
-		let (go_sender, go_receiver) = channel::<Arc<RwLock<WorldHistory>>>();
+		let (go_sender, go_receiver) = channel::<(Arc<RwLock<WorldHistory>>, u32)>();
 
 		self.systems_senders.push(go_sender);
 		self.systems_receivers.push(receiver);
 
-		thread::spawn(move || {
+		let _ = thread::Builder::new().name("system".to_string()).spawn(move || {
 			loop {
-				let world = go_receiver.recv().unwrap();
+				let (world, elapsed) = go_receiver.recv().unwrap();
 
-				let read_lock_world = world.read().expect("Cannot get world read lock for executing service");
+				let world = world.read().expect("Cannot get world read lock for executing service");
 
-				let effects = system.execute_tick(&read_lock_world);
+				let effects = system.execute_tick(&world, elapsed);
 
-				drop(read_lock_world);
+				drop(world);
 
 				sender.send(effects).unwrap();
 			}
@@ -72,26 +73,26 @@ impl <'a> Runner {
 	}
 
 	fn set_player_intentions_in_world(&mut self) {
-		let mut world = self.world.write().unwrap();
+		let world = self.world.write().unwrap().get_current();
 
-		let mut world = world.get_current();
-
-		let world = Arc::get_mut(&mut world).unwrap();
+		let mut world = world.write().unwrap();
 
 		for intention in &self.player_intention_buffer {
 			for player in world.players.iter_mut() {
 				if player.id == intention.player_id {
-					player.intention = Some(intention.intention.clone());
+					player.intention.push(intention.intention.clone());
 				}
 			}
 		}
+
+		self.player_intention_buffer.clear();
 	}
 
-	fn execute_systems(&mut self, _elapsed: u32) -> WorldUpdate {
+	fn execute_systems(&mut self, elapsed: u32) -> WorldUpdate {
 		let mut updates = WorldUpdate::new();
 		
 		for sender in self.systems_senders.iter() {
-			sender.send(self.world.clone()).unwrap();
+			sender.send((self.world.clone(), elapsed)).unwrap();
 		}
 
 		for receivers in self.systems_receivers.iter() {
@@ -106,7 +107,7 @@ impl <'a> Runner {
 	}
 
 	fn apply_effects(&self, world_history: &mut WorldHistory, updates: &WorldUpdate) {
-		let mut world = (*world_history.get_current()).clone();
+		let mut world = (*world_history.get_current().write().unwrap()).clone();
 
 		for update in updates.patchs.iter() {
 			match update {
@@ -125,13 +126,13 @@ impl <'a> Runner {
 	pub fn add_player(&mut self, player_id: u64) {
 		let mut world = self.world.write().unwrap();
 
-		let mut world = world.get_current();
+		let world = world.get_current();
 
-		let world = Arc::get_mut(&mut world).unwrap();
-
-		world.players.push(Pj {id: player_id, position: Position {x: 0.0, y: 0.0, z: 0.0}, intention: None});
-
-		drop(world);
+		world.write().unwrap().players.push(Pj {
+			id: player_id, 
+			position: Position {x: 0.0, y: 0.0, z: 0.0}, 
+			intention: vec!(Intention::ConnectPlayer)}
+		);
 	}
 
 	pub fn set_players_intention(&mut self, intentions: Vec<PlayerIntention>) {

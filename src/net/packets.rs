@@ -14,6 +14,7 @@ pub struct PacketType {
 	pub t: String,
 }
 
+#[derive(Debug, Clone)]
 pub enum ClientPacket {
 	Disconnected,
 	Login(Login),

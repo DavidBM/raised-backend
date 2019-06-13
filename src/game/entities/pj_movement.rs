@@ -5,7 +5,6 @@ use crate::game::engine::structs::Position;
 use crate::game::entities::domain::world::WorldHistory;
 use crate::game::entities::System;
 
-
 #[derive(Debug)]
 pub struct PjMovement;
 
@@ -19,24 +18,22 @@ impl PjMovement {
 }
 
 impl System for PjMovement {
-	fn execute_tick(&mut self, world: &WorldHistory) -> Vec<Effect> {
+	fn execute_tick(&mut self, world: &WorldHistory, elapsed: u32) -> Vec<Effect> {
 		let world = world.get_current_inmutable();
 		let mut players_positions: Vec<Effect> = Vec::new();
 
-		for player in &world.players {
+		for player in &world.read().unwrap().players {
 
-			let intention = match &player.intention {
-				Some(intention) => intention,
-				None => continue,
-			};
-			println!("Intetion {:?}", intention);
-			match intention {
-				Intention::Move{direction} => players_positions.push(Effect::PlayerMoved {
-					player_id: player.id,
-					position: self.get_next_position(&player, &direction, 0)
-				}),
-				_ => ()
-			}
+			player.intention.iter().for_each(|intention| {			
+				println!("Intetion {:?}", intention);
+				match intention {
+					Intention::Move{direction} => players_positions.push(Effect::PlayerMoved {
+						player_id: player.id,
+						position: self.get_next_position(&player, &direction, elapsed)
+					}),
+					_ => ()
+				}
+			});
 		}
 
 		players_positions

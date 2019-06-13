@@ -28,6 +28,8 @@ impl GameClient {
 			messages.push(game_message);
 		}
 
+		println!("Player packets: {:?}", messages);
+
 		if messages.len() > 0 {
 			Some(messages)
 		}else{
@@ -36,10 +38,20 @@ impl GameClient {
 	}
 
 	pub fn send(&self, notification: &Effect) {
-		let result = self.client.send("Hola! :D");
-		match result{
+		let stringify_result = serde_json::to_string(notification);
+
+		let serialized_notification = match stringify_result {
+			Ok(result) => result,
+			Err(error) => return println!("{:?}", error),
+		};
+
+		let send_result = self.client.send(serialized_notification);
+
+		match send_result{
 			Ok(_) => println!("Message send: {:?}", notification),
 			Err(error) => println!("{:?}", error)
 		}
+
+
 	}
 }

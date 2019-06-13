@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Position {
 	pub x: f32,
 	pub y: f32,

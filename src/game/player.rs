@@ -1,6 +1,6 @@
 use crate::game::structs::Effect;
 use crate::game::structs::PlayerIntention;
-use uuid::Uuid;
+
 use crate::net::GameClient as Client;
 use crate::net::ClientPacket;
 
@@ -37,6 +37,8 @@ impl Player {
 			}
 		}
 
+		println!("Player intentions: {:?}", intentions);
+
 		intentions
 	}
 
@@ -47,10 +49,6 @@ impl Player {
 				direction: action.direction
 			}
 		}
-	}
-
-	pub fn get_client_id(&self) -> Uuid {
-		self.net.get_id()
 	}
 
 	pub fn send(&self, message: &Effect) {
