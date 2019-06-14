@@ -51,10 +51,7 @@ impl World {
 	pub fn apply_to_player(&mut self, player_id: &u64, callback: impl Fn(&mut Pj) -> ()) {
 		let player = self.players.iter_mut().find(|pj| { pj.id == *player_id });
 
-		match player {
-			Some(player) => callback(player),
-			None => (),
-		}
+		if let Some(player) = player { callback(player); }
 	}
 }
 
