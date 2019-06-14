@@ -16,6 +16,7 @@ impl System for PjConnection {
 				println!("Intetion {:?}", intention);
 				match intention {
 					Intention::ConnectPlayer => players_positions.push(Effect::PlayerConnected(player.id)),
+					Intention::DisconnectPlayer => players_positions.push(Effect::PlayerDiconnected(player.id)),
 					_ => ()
 				}
 			});

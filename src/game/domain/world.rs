@@ -66,7 +66,7 @@ impl WorldUpdate {
 		WorldUpdate {patchs: Vec::new(), time: 0u64}
 	}
 
-	pub fn add_pach(& mut self, patch: Effect) {
-		self.patchs.push(patch);
+	pub fn add_pach(& mut self, mut patch: Vec<Effect>) {
+		self.patchs.append(&mut patch);
 	}
 }

@@ -97,10 +97,8 @@ impl <'a> Runner {
 		}
 
 		for receivers in self.systems_receivers.iter() {
-			let effects = receivers.recv().unwrap();
-		
-			for effect in effects {
-				updates.add_pach(effect);
+			if let Ok(effects) = receivers.recv() {
+				updates.add_pach(effects);
 			}
 		}
 

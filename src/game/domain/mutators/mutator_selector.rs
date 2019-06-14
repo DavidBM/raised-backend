@@ -8,7 +8,7 @@ pub fn apply_effects(effects: &Vec<Effect>, mut world: &mut World) {
 		match effect {
 			Effect::PlayerMoved{position, player_id} => player_moved(&mut world, position, *player_id),
 			Effect::PlayerConnected(_player_id) => (),
-			Effect::PlayerDiconnected(_player_id) => (),
+			Effect::PlayerDiconnected(player_id) => player_disconected(&mut world, player_id),
 		}
 	}
 }
