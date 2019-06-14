@@ -1,5 +1,5 @@
-use crate::game::entities::system_trait::System;
-use crate::game::entities::domain::world::WorldHistory;
+use crate::game::systems::System;
+use crate::game::domain::world::WorldHistory;
 use crate::game::structs::{Effect, Intention};
 
 #[derive(Debug)]

@@ -1,7 +1,7 @@
 use std::sync::RwLock;
 use std::sync::Arc;
 use crate::game::structs::Effect;
-use crate::game::entities::domain::Pj;
+use crate::game::domain::Pj;
 
 #[derive(Debug)]
 pub struct WorldHistory {

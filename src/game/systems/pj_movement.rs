@@ -1,9 +1,9 @@
 use crate::game::structs::{Effect, Intention};
-use crate::game::entities::domain::pj::Pj;
+use crate::game::domain::pj::Pj;
 use crate::config::player::SPEED;
 use crate::game::engine::structs::Position;
-use crate::game::entities::domain::world::WorldHistory;
-use crate::game::entities::System;
+use crate::game::domain::world::WorldHistory;
+use crate::game::systems::System;
 
 #[derive(Debug)]
 pub struct PjMovement;

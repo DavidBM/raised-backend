@@ -1,4 +1,4 @@
-use crate::game::entities::domain::world::WorldHistory;
+use crate::game::domain::world::WorldHistory;
 use crate::game::structs::Effect;
 use std::fmt::Debug;
 

@@ -1,10 +1,11 @@
 use crate::game::structs::{Effect, Intention};
 use crate::game::engine::structs::Position;
-use crate::game::entities::domain::pj::Pj;
+use crate::game::domain::mutators::apply_effects;
+use crate::game::domain::pj::Pj;
 use std::sync::RwLock;
 use crate::game::structs::PlayerIntention;
-use crate::game::entities::domain::world::{WorldUpdate, WorldHistory, World};
-use crate::game::entities::{PjMovement, System, PjConnection};
+use crate::game::domain::world::{WorldUpdate, WorldHistory, World};
+use crate::game::systems::{PjMovement, System, PjConnection};
 use std::sync::Arc;
 use std::thread;
 use std::sync::mpsc::{Sender, channel, Receiver};
@@ -109,14 +110,7 @@ impl <'a> Runner {
 	fn apply_effects(&self, world_history: &mut WorldHistory, updates: &WorldUpdate) {
 		let mut world = (*world_history.get_current().write().unwrap()).clone();
 
-		for update in updates.patchs.iter() {
-			match update {
-				Effect::PlayerMoved{player_id, position} => world.apply_to_player(player_id, |player: &mut Pj| {
-					player.position = position.clone();
-				} ),
-				_ => (),
-			}
-		}
+		apply_effects(&updates.patchs, &mut world);
 
 		world.version += 1;
 
