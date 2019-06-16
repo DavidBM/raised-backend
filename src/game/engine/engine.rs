@@ -18,6 +18,7 @@ pub struct Runner {
 	systems: Vec<Box<dyn System>>,
 	systems_senders: Vec<Sender<(Arc<RwLock<WorldHistory>>, u32)>>,
 	systems_receivers: Vec<Receiver<Vec<Effect>>>,
+	threads_handler: Vec<std::thread::JoinHandle<()>>
 }
 
 impl <'a> Runner {
@@ -32,6 +33,7 @@ impl <'a> Runner {
 			systems: Vec::new(),
 			systems_receivers: Vec::new(),
 			systems_senders: Vec::new(),
+			threads_handler: Vec::new(),
 		};
 
 		runner.add_system(Box::new(PjMovement {}));
@@ -41,15 +43,17 @@ impl <'a> Runner {
 	}
 
 	fn add_system(&mut self, mut system: Box<dyn System>) {
-		let (sender, receiver) = channel::<Vec<Effect>>();
-		let (go_sender, go_receiver) = channel::<(Arc<RwLock<WorldHistory>>, u32)>();
+		let (effects_sender, effects_receiver) = channel::<Vec<Effect>>();
+		let (tick_sender, tick_receiver) = channel::<(Arc<RwLock<WorldHistory>>, u32)>();
 
-		self.systems_senders.push(go_sender);
-		self.systems_receivers.push(receiver);
+		self.systems_senders.push(tick_sender);
+		self.systems_receivers.push(effects_receiver);
 
-		let _ = thread::Builder::new().name("system".to_string()).spawn(move || {
+		let thread_error_message = format!("Failed to create thread for System {:?}", system);
+
+		let thread_handler = thread::Builder::new().name("system".to_string()).spawn(move || {
 			loop {
-				let (world, elapsed) = go_receiver.recv().unwrap();
+				let (world, elapsed) = tick_receiver.recv().unwrap();
 
 				let world = world.read().expect("Cannot get world read lock for executing service");
 
@@ -57,9 +61,11 @@ impl <'a> Runner {
 
 				drop(world);
 
-				sender.send(effects).unwrap();
+				effects_sender.send(effects).unwrap();
 			}
-		});
+		}).expect(&thread_error_message);
+
+		self.threads_handler.push(thread_handler);
 	}
 
 	pub fn update(&mut self, elapsed: u32) -> WorldUpdate {
