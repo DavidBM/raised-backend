@@ -1,14 +1,14 @@
+use std::sync::RwLock;
+use std::sync::Arc;
+use std::thread;
+use std::sync::mpsc::{Sender, channel, Receiver};
 use crate::game::structs::{Effect, Intention};
 use crate::game::engine::structs::Position;
 use crate::game::domain::mutators::apply_effects;
 use crate::game::domain::pj::Pj;
-use std::sync::RwLock;
 use crate::game::structs::PlayerIntention;
 use crate::game::domain::world::{WorldUpdate, WorldHistory, World};
 use crate::game::systems::{PjMovement, System, PjConnection};
-use std::sync::Arc;
-use std::thread;
-use std::sync::mpsc::{Sender, channel, Receiver};
 
 #[derive(Debug)]
 pub struct Runner {
@@ -51,7 +51,9 @@ impl <'a> Runner {
 
 		let thread_error_message = format!("Failed to create thread for System {:?}", system);
 
-		let thread_handler = thread::Builder::new().name("system".to_string()).spawn(move || {
+		let thread_handler = thread::Builder::new()
+		.name(format!("{} System", system))
+		.spawn(move || {
 			loop {
 				let (world, elapsed) = tick_receiver.recv().unwrap();
 

@@ -25,3 +25,9 @@ impl System for PjConnection {
 		players_positions
 	}
 }
+
+impl std::fmt::Display for PjConnection {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		write!(f, "PjMovement")
+	}
+}

@@ -39,3 +39,9 @@ impl System for PjMovement {
 		players_positions
 	}
 }
+
+impl std::fmt::Display for PjMovement {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		write!(f, "PjMovement")
+	}
+}
