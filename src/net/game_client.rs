@@ -28,7 +28,7 @@ impl GameClient {
 			messages.push(game_message);
 		}
 
-		println!("Player packets: {:?}", messages);
+		trace!("Player packets: {:?}", messages);
 
 		if messages.len() > 0 {
 			Some(messages)
@@ -42,14 +42,14 @@ impl GameClient {
 
 		let serialized_notification = match stringify_result {
 			Ok(result) => result,
-			Err(error) => return println!("{:?}", error),
+			Err(error) => return trace!("{:?}", error),
 		};
 
 		let send_result = self.client.send(serialized_notification);
 
 		match send_result{
-			Ok(_) => println!("Message send: {:?}", notification),
-			Err(error) => println!("{:?}", error)
+			Ok(_) => trace!("Message send: {:?} {:?}", &self, notification),
+			Err(error) => trace!("{:?} {:?}", &self, error)
 		}
 
 

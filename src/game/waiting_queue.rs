@@ -35,7 +35,7 @@ impl WaitingQueue {
 	}
 
 	pub fn add_client(&mut self, client: net::GameClient) {
-		println!("Client added to waiting queue. ID: {:?}", client);
+		info!("Client added to waiting queue. ID: {:?}", client);
 		self.clients.push(client);
 	}
 
@@ -44,7 +44,7 @@ impl WaitingQueue {
 
 		if let Some(index) = index {
 			let client = self.clients.swap_remove(index);
-			println!("Client removed from waiting queue: {:?}", client);
+			info!("Client removed from waiting queue: {:?}", client);
 		}
 	}
 

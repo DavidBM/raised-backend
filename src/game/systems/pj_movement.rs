@@ -22,10 +22,12 @@ impl System for PjMovement {
 		let world = world.get_current_inmutable();
 		let mut players_positions: Vec<Effect> = Vec::new();
 
-		for player in &world.read().unwrap().players {
+		let players = &world.read().expect(&format!("Cannot get read lock in Service {}", &self)).players;
+
+		for player in players {
 
 			player.intention.iter().for_each(|intention| {			
-				println!("Intetion {:?}", intention);
+				trace!("PjMovement processing intention {:?} {:?}", player, intention);
 				match intention {
 					Intention::Move{direction} => players_positions.push(Effect::PlayerMoved {
 						player_id: player.id,

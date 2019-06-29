@@ -1,11 +1,11 @@
 extern crate ws;
 extern crate uuid;
-extern crate env_logger;
 extern crate serde;
 extern crate serde_json;
 extern crate time;
-#[macro_use]
-extern crate serde_derive;
+extern crate env_logger;
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate log;
 
 mod game;
 mod net;
@@ -17,13 +17,14 @@ use crate::game::WaitingQueue;
 use crate::game::structs::ClientActions;
 
 fn main() {
-	println!("Starting server...");
+	env_logger::from_env(env_logger::Env::default().default_filter_or("warn,ws=info")).init();
+	warn!("Starting server...");
 
 	let (channel_sender, channel_receiver): (Sender<ClientActions>, Receiver<ClientActions>) = Channel();
 
 	thread::spawn(move || {
 		let mut waiting_queue = WaitingQueue::new(channel_receiver);
-		println!("WaitingQueue created");
+		trace!("WaitingQueue created");
 		waiting_queue.wait_clients()
 	});
 

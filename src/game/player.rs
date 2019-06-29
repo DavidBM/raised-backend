@@ -37,7 +37,7 @@ impl Player {
 			}
 		}
 
-		println!("Player intentions: {:?}", intentions);
+		trace!("Player intentions: {:?}", intentions);
 
 		intentions
 	}

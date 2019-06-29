@@ -8,7 +8,7 @@ use crate::game::structs::ClientActions;
 
 pub fn start(address: &str, waiting_queue: Sender<ClientActions>) {
 
-	println!("Listening webSocket connections");
+	warn!("Server start on: {}", address);
 
 	listen(address, |out| {
 		let (packer_sender, packet_receiver): (Sender<ClientPacket>, Receiver<ClientPacket>) = mpsc::channel();
@@ -20,5 +20,5 @@ pub fn start(address: &str, waiting_queue: Sender<ClientActions>) {
 		waiting_queue.send(ClientActions::New(client)).unwrap();
 
 		WsClient::new(id.clone() ,packer_sender, waiting_queue.clone())
-	}).unwrap()
+	}).expect("Cannot start ws server");
 }

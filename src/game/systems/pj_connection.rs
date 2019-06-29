@@ -13,7 +13,7 @@ impl System for PjConnection {
 		for player in &world.read().unwrap().players {
 
 			player.intention.iter().for_each(|intention| {			
-				println!("Intetion {:?}", intention);
+				trace!("PjConnection processing intention {:?} {:?}", player, intention);
 				match intention {
 					Intention::ConnectPlayer => players_positions.push(Effect::PlayerConnected(player.id)),
 					Intention::DisconnectPlayer => players_positions.push(Effect::PlayerDiconnected(player.id)),
@@ -28,6 +28,6 @@ impl System for PjConnection {
 
 impl std::fmt::Display for PjConnection {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		write!(f, "PjMovement")
+		write!(f, "PjConnection")
 	}
 }

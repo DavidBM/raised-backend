@@ -37,12 +37,12 @@ pub enum Effect {
 }
 
 impl Effect {
-	pub fn get_id(&self) -> Option<u64> {
+	/*pub fn get_id(&self) -> Option<u64> {
 		match self {
 			&Effect::PlayerMoved{player_id, ..} => Some(player_id),
 			&Effect::PlayerConnected(player_id) => Some(player_id),
 			&Effect::PlayerDiconnected(player_id) => Some(player_id),
 		}
-	}
+	}*/
 }
 

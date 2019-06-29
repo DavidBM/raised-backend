@@ -30,9 +30,10 @@ impl<'a> Game {
 
 			let duration = (precise_time_ns() - time) as u32;
 
-			if cfg!(debug_assertions){
-				print!("Tick time ns: {:.5} - Sleep time ns: {:.5}     \x0D", duration, TICK_TIME as i32 - duration as i32);
-			}
+			info!("Tick time ms: {:.10} - Sleep time ms: {:.10}", 
+				duration as f64 / 1000000.0, 
+				TICK_TIME as f64 / 1000000.0 as f64 - duration as f64 / 1000000.0 as f64
+			);
 
 			if duration < TICK_TIME {
 				sleep(Duration::new(0, TICK_TIME - duration));
@@ -44,7 +45,7 @@ impl<'a> Game {
 		self.update_players_updates();
 		let updates = self.runner.update(elapsed);
 
-		println!("World updated {:?}", updates);
+		trace!("World updated {:?}", updates);
 
 		for update in updates.patchs {
 			match update {
@@ -65,7 +66,7 @@ impl<'a> Game {
 
 		for player in &self.players {
 			let updates = player.get_updates();
-			println!("Player updates: {:?}", updates);
+			trace!("Player updates: {:?}", updates);
 			self.runner.set_players_intention(updates);
 		}
 	}

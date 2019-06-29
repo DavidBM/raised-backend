@@ -37,7 +37,7 @@ impl WsClient {
 
 		match decoded {
 			Ok(data) => self.extract_data(data, text),
-			Err(e) => println!("Not identified ws net package {:?}", e),
+			Err(e) => trace!("Not identified ws net package {:?}", e),
 		}
 	}
 
@@ -48,7 +48,7 @@ impl WsClient {
 			"stay" => self.sender.send(ClientPacket::Stay).unwrap(),
 			"attack" => self.attack_message(packet),
 			"equip" => self.equip_message(packet),
-			_ => println!("Not know message type: {:?}", message)
+			_ => warn!("Not know message type: {:?}", message)
 		}
 	}
 
@@ -88,7 +88,7 @@ impl WsClient {
 impl ws::Handler for WsClient {
 
 	fn on_open(&mut self, _: ws::Handshake) -> ws::Result<()> {
-		//println!("New connection...");
+		trace!("New connection: {:?}", &self);
 		Ok(())
 	}
 
@@ -107,14 +107,14 @@ impl ws::Handler for WsClient {
 		self.sender.send(ClientPacket::Disconnected).unwrap();
 
 		match code {
-			ws::CloseCode::Normal => println!("The client is done with the connection."),
-			ws::CloseCode::Away   => println!("The client is leaving the site."),
-			ws::CloseCode::Abnormal => println!("Closing handshake failed! Unable to obtain closing status from client."),
-			_ => println!("The client encountered an error: {}", reason),
+			ws::CloseCode::Normal => trace!("The client is done with the connection: {:?} {:?} {:?}", &self, code, reason),
+			ws::CloseCode::Away   => trace!("The client is leaving the site: {:?} {:?} {:?}", &self, code, reason),
+			ws::CloseCode::Abnormal => trace!("Closing handshake failed! Unable to obtain closing status from client: {:?} {:?} {:?}", &self, code, reason),
+			_ => trace!("The client encountered an error: {:?} {:?} {:?}", &self, code, reason),
 		}
 	}
 
 	fn on_error(&mut self, err: ws::Error) {
-		println!("The server encountered an error: {:?}", err);
+		trace!("The server encountered an error: {:?} {:?}", &self, err);
 	}
 }
