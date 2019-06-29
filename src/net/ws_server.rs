@@ -17,7 +17,7 @@ pub fn start(address: &str, waiting_queue: Sender<ClientActions>) {
 
 		let client = GameClient::new(id, out, packet_receiver);
 
-		waiting_queue.send(ClientActions::New(client)).unwrap();
+		waiting_queue.send(ClientActions::New(client)).expect("Cannot send a client to the waiting queue");
 
 		WsClient::new(id.clone() ,packer_sender, waiting_queue.clone())
 	}).expect("Cannot start ws server");

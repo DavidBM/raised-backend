@@ -20,13 +20,13 @@ fn main() {
 	env_logger::from_env(env_logger::Env::default().default_filter_or("warn,ws=info")).init();
 	warn!("Starting server...");
 
-	let (channel_sender, channel_receiver): (Sender<ClientActions>, Receiver<ClientActions>) = Channel();
+	let (actions_sender, actions_receiver): (Sender<ClientActions>, Receiver<ClientActions>) = Channel();
 
 	thread::spawn(move || {
-		let mut waiting_queue = WaitingQueue::new(channel_receiver);
+		let mut waiting_queue = WaitingQueue::new(actions_receiver);
 		trace!("WaitingQueue created");
 		waiting_queue.wait_clients()
 	});
 
-	net::ws_server::start("127.0.0.1:3012", channel_sender)
+	net::ws_server::start("127.0.0.1:3012", actions_sender)
 }

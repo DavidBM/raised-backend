@@ -37,7 +37,7 @@ impl WsClient {
 
 		match decoded {
 			Ok(data) => self.extract_data(data, text),
-			Err(e) => trace!("Not identified ws net package {:?}", e),
+			Err(e) => info!("Not identified ws net package {:?}", e),
 		}
 	}
 
