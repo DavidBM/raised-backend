@@ -115,10 +115,10 @@ impl ws::Handler for WsClient {
 		self.sender.send(ClientPacket::Disconnected).unwrap();
 
 		match code {
-			ws::CloseCode::Normal => trace!("The client is done with the connection: {:?} {:?} {:?}", &self, code, reason),
-			ws::CloseCode::Away   => trace!("The client is leaving the site: {:?} {:?} {:?}", &self, code, reason),
-			ws::CloseCode::Abnormal => trace!("Closing handshake failed! Unable to obtain closing status from client: {:?} {:?} {:?}", &self, code, reason),
-			_ => trace!("The client encountered an error: {:?} {:?} {:?}", &self, code, reason),
+			ws::CloseCode::Normal => trace!("The new client is done with the connection: {:?} {:?} {:?}", &self, code, reason),
+			ws::CloseCode::Away   => trace!("The new client is leaving the site: {:?} {:?} {:?}", &self, code, reason),
+			ws::CloseCode::Abnormal => trace!("Closing ws handshake failed! Unable to obtain closing status from client: {:?} {:?} {:?}", &self, code, reason),
+			_ => trace!("The net client encountered an error: {:?} {:?} {:?}", &self, code, reason),
 		}
 	}
 
