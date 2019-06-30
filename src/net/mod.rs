@@ -1,9 +1,9 @@
+pub use self::game_client::GameClient;
 pub use self::packets::ClientPacket;
 pub use self::packets::ServerMessage;
 pub use self::ws_client::WsClient;
-pub use self::game_client::GameClient;
 
-mod ws_client;
 mod game_client;
 pub mod packets;
+mod ws_client;
 pub mod ws_server;
