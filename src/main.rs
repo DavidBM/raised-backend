@@ -1,5 +1,3 @@
-#![feature(proc_macro_hygiene)]
-
 extern crate ws;
 extern crate uuid;
 extern crate serde;
