@@ -2,7 +2,7 @@ use std::sync::mpsc::{Receiver};
 use crate::game::structs::ClientActions;
 use uuid::Uuid;
 use crate::net;
-use crate::game::{Game, Player};
+use crate::game::{GameManager, Player};
 use std::thread;
 use std::u64;
 
@@ -16,7 +16,7 @@ pub struct WaitingQueue {
 impl WaitingQueue {
 	pub fn new(receiver: Receiver<ClientActions>) -> WaitingQueue {
 		let clients: Vec<net::GameClient> = Vec::new();
-		WaitingQueue { clients:  clients, receiver: receiver, players_count: 0 }
+		WaitingQueue { clients, receiver, players_count: 0 }
 	}
 
 	pub fn wait_clients(&mut self) {
@@ -55,7 +55,7 @@ impl WaitingQueue {
 	}
 
 	fn create_game(&mut self) {
-		let mut game = Game::new();
+		let mut game = GameManager::new();
 
 		for _ in 0..4 {
 			let client = self.clients.remove(0);

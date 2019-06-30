@@ -9,18 +9,18 @@ macro_rules! packet_decode {
 	($($name:tt : $type:ty),*,) => {
 		paste::item! {
 			$(
-					fn [<decode_ $name _message>](&self, packet: &str) {
-						let decoded = {
-							use packets::*;
-							let decoded: Result<$type, _> = serde_json::from_str(packet);
-							decoded
-						};
+				fn [<decode_ $name _message>](&self, packet: &str) {
+					let decoded = {
+						use packets::*;
+						let decoded: Result<$type, _> = serde_json::from_str(packet);
+						decoded
+					};
 
-						use ClientPacket::*;
-						if let Ok(data) = decoded {
-							self.sender.send($type(data)).expect(concat!("Cannot send to game client decoded message ", stringify!($name)));
-						}
+					use ClientPacket::*;
+					if let Ok(data) = decoded {
+						self.sender.send($type(data)).expect(concat!("Cannot send to game client decoded message ", stringify!($name)));
 					}
+				}
 			)*
 		}
 	};
@@ -57,10 +57,10 @@ pub struct WsClient {
 impl WsClient {
 	pub fn new(id: Uuid, sender: mpsc::Sender<ClientPacket>, waiting_sender: mpsc::Sender<ClientActions>) -> WsClient {
 		WsClient {
-			id: id,
+			id,
 			validated: false,
-			sender: sender,
-			waiting_sender: waiting_sender
+			sender,
+			waiting_sender
 		}
 	}
 
@@ -111,7 +111,7 @@ impl ws::Handler for WsClient {
 	}
 
 	fn on_close(&mut self, code: ws::CloseCode, reason: &str) {
-		let action = ClientActions::Delete(self.id.clone());
+		let action = ClientActions::Delete(self.id);
 		self.waiting_sender.send(action).unwrap();
 
 		self.sender.send(ClientPacket::Disconnected).unwrap();

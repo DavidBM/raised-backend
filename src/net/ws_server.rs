@@ -19,6 +19,6 @@ pub fn start(address: &str, waiting_queue: Sender<ClientActions>) {
 
 		waiting_queue.send(ClientActions::New(client)).expect("Cannot send a client to the waiting queue");
 
-		WsClient::new(id.clone() ,packer_sender, waiting_queue.clone())
+		WsClient::new(id ,packer_sender, waiting_queue.clone())
 	}).expect("Cannot start ws server");
 }

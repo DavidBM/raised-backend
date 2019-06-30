@@ -4,17 +4,16 @@ use std::thread::sleep;
 use std::time::Duration;
 use time::precise_time_ns;
 use crate::config::engine::TICK_TIME;
-use crate::game::structs::Effect;
 
 #[derive(Debug)]
-pub struct Game {
+pub struct GameManager {
 	runner: Engine,
 	players: Vec<Player>
 }
 
-impl<'a> Game {
-	pub fn new() -> Game {
-		Game { runner: Engine::new(), players: Vec::new() }
+impl<'a> GameManager {
+	pub fn new() -> GameManager {
+		GameManager { runner: Engine::new(), players: Vec::new() }
 	}
 
 	pub fn add_player(&mut self, player: Player) {
@@ -31,8 +30,8 @@ impl<'a> Game {
 			let duration = (precise_time_ns() - time) as u32;
 
 			info!("Tick time ms: {:.10} - Sleep time ms: {:.10}", 
-				duration as f64 / 1000000.0, 
-				TICK_TIME as f64 / 1000000.0 as f64 - duration as f64 / 1000000.0 as f64
+				f64::from(duration) / 1_000_000.0, 
+				f64::from(TICK_TIME) / 1_000_000.0 as f64 - f64::from(duration) / 1_000_000.0 as f64
 			);
 
 			if duration < TICK_TIME {
@@ -48,16 +47,13 @@ impl<'a> Game {
 		trace!("World updated {:?}", updates);
 
 		for update in updates.patchs {
-			match update {
-				Effect::PlayerMoved {player_id, ..}=> {
-					let player = self.get_player_by_id(player_id);
-						match player {
-							Some(player) => player.send(&update),
-							None => (),
-						}
-					()
-				},
-				_ => ()
+			let player_id = update.get_player_id();
+
+			if let Some(player_id) = player_id {
+
+				let player = self.get_player_by_id(player_id);
+
+				if let Some(player) = player { player.send(&update) }
 			}
 		}
 	}

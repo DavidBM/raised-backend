@@ -15,7 +15,7 @@ pub struct Player {
 
 impl Player {
 	pub fn new(client: Client, id: u64) -> Player {
-		Player {net: client, id: id}
+		Player {net: client, id}
 	}
 
 	fn get_update(&self, message: ClientPacket) -> PlayerIntention{

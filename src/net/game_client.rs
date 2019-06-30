@@ -14,11 +14,11 @@ pub struct GameClient {
 
 impl GameClient {
 	pub fn new(id: Uuid, client: Sender, receiver: mpsc::Receiver<ClientPacket>) -> GameClient {
-		GameClient {id: id, receiver: receiver, client: client}
+		GameClient {id, receiver, client}
 	}
 
 	pub fn get_id(&self) -> Uuid {
-		self.id.clone()
+		self.id
 	}
 
 	pub fn get_messages(&self) -> Option<Vec<ClientPacket>> {
@@ -30,7 +30,7 @@ impl GameClient {
 
 		trace!("Player packets: {:?}", messages);
 
-		if messages.len() > 0 {
+		if !messages.is_empty() {
 			Some(messages)
 		}else{
 			None

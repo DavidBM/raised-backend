@@ -48,8 +48,8 @@ impl World {
 		World {players: Vec::new(), version: 0u64, path: WorldUpdate::new()}
 	}
 
-	pub fn apply_to_player(&mut self, player_id: &u64, callback: impl Fn(&mut Pj) -> ()) {
-		let player = self.players.iter_mut().find(|pj| { pj.id == *player_id });
+	pub fn apply_to_player(&mut self, player_id: u64, callback: impl Fn(&mut Pj) -> ()) {
+		let player = self.players.iter_mut().find(|pj| { pj.id == player_id });
 
 		if let Some(player) = player { callback(player); }
 	}
