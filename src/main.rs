@@ -1,9 +1,13 @@
+#![feature(proc_macro_hygiene)]
+
 extern crate ws;
 extern crate uuid;
 extern crate serde;
 extern crate serde_json;
 extern crate time;
 extern crate env_logger;
+extern crate casey;
+extern crate paste;
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate log;
 

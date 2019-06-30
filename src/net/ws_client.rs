@@ -1,11 +1,51 @@
 use std::sync::mpsc;
 use ws;
 use uuid::Uuid;
-
 use serde_json;
+use casey::camel;
 use crate::net::*;
 use crate::game::structs::ClientActions;
 
+macro_rules! packet_decode {
+	($($name:tt),*,) => {
+		$(
+			paste::item! {
+				fn [<$name _message>](&self, packet: &str) {
+					let decoded = {
+						use packets::*;
+						let decoded: Result<camel!($name), _> = serde_json::from_str(packet);
+						decoded
+					};
+
+					use ClientPacket::*;
+					if let Ok(data) = decoded {
+						self.sender.send(camel!($name)(data)).expect(&format!("Cannot send decoded message $name"));
+					}
+				}
+			}
+		)*
+	};
+}
+
+macro_rules! packet_extract {
+	($($name:tt),*,) => {
+		paste::item! {
+			fn extract_data(&self, message: packets::PacketType, packet: &str) {
+				match message.t.as_ref() {
+					$( stringify!($name) => self.[<$name _message>](packet), )*
+					_ => self.extract_data_special_cases(message, packet),
+				}
+			}
+		}
+	};
+}
+
+macro_rules! implement_decoding {
+	($($name:ident),*) => {
+		packet_extract!( $($name,)*);
+		packet_decode!( $($name,)*);
+	};
+}
 
 #[derive(Debug)]
 pub struct WsClient {
@@ -41,49 +81,17 @@ impl WsClient {
 		}
 	}
 
-	fn extract_data(&self, message: packets::PacketType, packet: &str) {
+	fn extract_data_special_cases(&self, message: packets::PacketType, _packet: &str) {
 		match message.t.as_ref() {
-			"login" => self.login_message(packet),
-			"move" => self.move_message(packet),
 			"stay" => self.sender.send(ClientPacket::Stay).unwrap(),
-			"attack" => self.attack_message(packet),
-			"equip" => self.equip_message(packet),
 			_ => warn!("Not know message type: {:?}", message)
 		}
 	}
 
-	fn login_message(&self, packet: &str) {
-		let decoded: Result<packets::Login, _> = serde_json::from_str(packet);
-
-		if let Ok(data) = decoded {
-			self.sender.send(ClientPacket::Login(data)).unwrap();
-		}
-	}
-
-	fn move_message(&self, packet: &str) {
-		let decoded: Result<packets::Move, _> = serde_json::from_str(packet);
-
-		if let Ok(data) = decoded {
-			self.sender.send(ClientPacket::Move(data)).unwrap();
-		}
-	}
-
-	fn attack_message(&self, packet: &str) {
-		let decoded: Result<packets::Attack, _> = serde_json::from_str(packet);
-
-		if let Ok(data) = decoded {
-			self.sender.send(ClientPacket::Attack(data)).unwrap();
-		}
-	}
-
-	fn equip_message(&self, packet: &str) {
-		let decoded: Result<packets::Equip, _> = serde_json::from_str(packet);
-
-		if let Ok(data) = decoded {
-			self.sender.send(ClientPacket::Equip(data)).unwrap();
-		}
-	}
+	implement_decoding!(equip, attack, login, move);
 }
+
+
 
 impl ws::Handler for WsClient {
 
