@@ -20,7 +20,7 @@ impl WorldHistory {
 
         match world {
             Some(world) => world.clone(),
-            None => panic!("No actual world! {:?}", self),
+            None => panic!("No current world! {:?}", self),
         }
     }
 
@@ -29,7 +29,7 @@ impl WorldHistory {
 
         match world {
             Some(world) => world.clone(),
-            None => panic!("No actual world! {:?}", self),
+            None => panic!("No current world! {:?}", self),
         }
     }
 
