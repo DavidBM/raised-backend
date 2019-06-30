@@ -7,22 +7,22 @@ use crate::game::structs::ClientActions;
 
 macro_rules! packet_decode {
 	($($name:tt : $type:ty),*,) => {
-		$(
-			paste::item! {
-				fn [<decode_ $name _message>](&self, packet: &str) {
-					let decoded = {
-						use packets::*;
-						let decoded: Result<$type, _> = serde_json::from_str(packet);
-						decoded
-					};
+		paste::item! {
+			$(
+					fn [<decode_ $name _message>](&self, packet: &str) {
+						let decoded = {
+							use packets::*;
+							let decoded: Result<$type, _> = serde_json::from_str(packet);
+							decoded
+						};
 
-					use ClientPacket::*;
-					if let Ok(data) = decoded {
-						self.sender.send($type(data)).expect(concat!("Cannot send to game client decoded message ", stringify!($name)));
+						use ClientPacket::*;
+						if let Ok(data) = decoded {
+							self.sender.send($type(data)).expect(concat!("Cannot send to game client decoded message ", stringify!($name)));
+						}
 					}
-				}
-			}
-		)*
+			)*
+		}
 	};
 }
 
