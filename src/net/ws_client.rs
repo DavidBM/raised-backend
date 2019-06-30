@@ -2,24 +2,19 @@ use std::sync::mpsc;
 use ws;
 use uuid::Uuid;
 use serde_json;
-use casey::camel;
+
 use crate::net::*;
 use crate::game::structs::ClientActions;
 
 macro_rules! packet_decode {
-	($($name:tt),*,) => {
+	($($name:ident : $packet:ty => $action:ty),*,) => {
 		$(
 			paste::item! {
 				fn [<$name _message>](&self, packet: &str) {
-					let decoded = {
-						use packets::*;
-						let decoded: Result<camel!($name), _> = serde_json::from_str(packet);
-						decoded
-					};
+					let decoded: Result<$packet, _> = serde_json::from_str(packet);
 
-					use ClientPacket::*;
 					if let Ok(data) = decoded {
-						self.sender.send(camel!($name)(data)).expect(concat!("Cannot send to game client decoded message ", stringify!($name)));
+						self.sender.send($action(data)).expect(concat!("Cannot send to game client decoded message ", stringify!($name)));
 					}
 				}
 			}
@@ -28,7 +23,7 @@ macro_rules! packet_decode {
 }
 
 macro_rules! packet_extract {
-	($($name:tt),*,) => {
+	($($name:ident : $packet:ty => $action:ty),*,) => {
 		paste::item! {
 			fn extract_data(&self, message: packets::PacketType, packet: &str) {
 				match message.t.as_ref() {
@@ -41,9 +36,9 @@ macro_rules! packet_extract {
 }
 
 macro_rules! implement_decoding {
-	($($name:ident),*) => {
-		packet_extract!( $($name,)*);
-		packet_decode!( $($name,)*);
+	($($name:ident : $packet:ty => $action:ty),*) => {
+		packet_extract!( $($name : $packet => $action,)*);
+		packet_decode!( $($name : $packet => $action,)*);
 	};
 }
 
@@ -88,10 +83,13 @@ impl WsClient {
 		}
 	}
 
-	implement_decoding!(equip, attack, login, move);
+	implement_decoding!(
+		equip: packets::Equip => ClientPacket::Equip,
+		attack: packets::Attack => ClientPacket::Attack,
+		login: packets::Login => ClientPacket::Login,
+		move: packets::Move => ClientPacket::Move
+	);
 }
-
-
 
 impl ws::Handler for WsClient {
 
