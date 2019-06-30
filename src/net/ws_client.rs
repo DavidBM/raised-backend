@@ -19,7 +19,7 @@ macro_rules! packet_decode {
 
 					use ClientPacket::*;
 					if let Ok(data) = decoded {
-						self.sender.send(camel!($name)(data)).expect(&format!("Cannot send decoded message $name"));
+						self.sender.send(camel!($name)(data)).expect(concat!("Cannot send to game client decoded message ", stringify!($name)));
 					}
 				}
 			}
@@ -83,7 +83,7 @@ impl WsClient {
 
 	fn extract_data_special_cases(&self, message: packets::PacketType, _packet: &str) {
 		match message.t.as_ref() {
-			"stay" => self.sender.send(ClientPacket::Stay).unwrap(),
+			"stay" => self.sender.send(ClientPacket::Stay).expect("Cannot send to game client decoded message stay"),
 			_ => warn!("Not know message type: {:?}", message)
 		}
 	}
