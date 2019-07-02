@@ -32,7 +32,7 @@ impl<'a> GameManager {
 
             let duration = (precise_time_ns() - time) as u32;
 
-            warn!(
+            info!(
                 "Tick time ms: {:.10} - Sleep time ms: {:.10}",
                 f64::from(duration) / 1_000_000.0,
                 f64::from(TICK_TIME) / 1_000_000.0 as f64 - f64::from(duration) / 1_000_000.0 as f64
