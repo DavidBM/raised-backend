@@ -32,7 +32,7 @@ impl<'a> GameManager {
 
             let duration = (precise_time_ns() - time) as u32;
 
-            info!(
+            warn!(
                 "Tick time ms: {:.10} - Sleep time ms: {:.10}",
                 f64::from(duration) / 1_000_000.0,
                 f64::from(TICK_TIME) / 1_000_000.0 as f64 - f64::from(duration) / 1_000_000.0 as f64
@@ -51,15 +51,22 @@ impl<'a> GameManager {
         trace!("World updated {:?}", updates);
 
         for update in updates.patchs {
-            let player_id = update.get_player_id();
+            //let player_id = update.get_player_id();
 
-            if let Some(player_id) = player_id {
+            for player in &self.players {
+                player.send(&update);
+            }
+
+            // TODO: For now we send each effect to all players. 
+            // What we need to do is to create a function that decides to what player to send each effect.
+
+            /*if let Some(player_id) = player_id {
                 let player = self.get_player_by_id(player_id);
 
                 if let Some(player) = player {
                     player.send(&update)
                 }
-            }
+            }*/
         }
     }
 
@@ -71,7 +78,7 @@ impl<'a> GameManager {
         }
     }
 
-    fn get_player_by_id(&'a mut self, id: u64) -> Option<&'a mut Player> {
+    /*fn get_player_by_id(&'a mut self, id: u64) -> Option<&'a mut Player> {
         self.players.iter_mut().find(|player| player.id == id)
-    }
+    }*/
 }

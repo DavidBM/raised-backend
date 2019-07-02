@@ -6,44 +6,44 @@ use uuid::Uuid;
 use ws;
 
 macro_rules! packet_decode {
-	($($name:tt : $type:ty),*,) => {
-		paste::item! {
-			$(
-				fn [<decode_ $name _message>](&self, packet: &str) {
-					let decoded = {
-						use packets::*;
-						let decoded: Result<$type, _> = serde_json::from_str(packet);
-						decoded
-					};
+    ($($name:tt : $type:ty),*,) => {
+        paste::item! {
+            $(
+                fn [<decode_ $name _message>](&self, packet: &str) {
+                    let decoded = {
+                        use packets::*;
+                        let decoded: Result<$type, _> = serde_json::from_str(packet);
+                        decoded
+                    };
 
-					use ClientPacket::*;
-					if let Ok(data) = decoded {
-						self.sender.send($type(data)).expect(concat!("Cannot send to game client decoded message: ", stringify!($name)));
-					}
-				}
-			)*
-		}
-	};
+                    use ClientPacket::*;
+                    if let Ok(data) = decoded {
+                        self.sender.send($type(data)).expect(concat!("Cannot send to game client decoded message: ", stringify!($name)));
+                    }
+                }
+            )*
+        }
+    };
 }
 
 macro_rules! packet_extract {
-	($($name:tt),*,) => {
-		paste::item! {
-			fn extract_data(&self, message: packets::PacketType, packet: &str) {
-				match message.t.as_ref() {
-					$( stringify!($name) => self.[<decode_ $name _message>](packet), )*
-					_ => self.extract_data_special_cases(message, packet),
-				}
-			}
-		}
-	};
+    ($($name:tt),*,) => {
+        paste::item! {
+            fn extract_data(&self, message: packets::PacketType, packet: &str) {
+                match message.t.as_ref() {
+                    $( stringify!($name) => self.[<decode_ $name _message>](packet), )*
+                    _ => self.extract_data_special_cases(message, packet),
+                }
+            }
+        }
+    };
 }
 
 macro_rules! implement_decoding {
-	($($name:tt : $type:ty),*) => {
-		packet_extract!( $($name,)*);
-		packet_decode!( $($name:$type,)*);
-	};
+    ($($name:tt : $type:ty),*) => {
+        packet_extract!( $($name,)*);
+        packet_decode!( $($name : $type,)*);
+    };
 }
 
 #[derive(Debug)]
@@ -90,11 +90,11 @@ impl WsClient {
     }
 
     implement_decoding!(
-		equip: Equip,
-		attack: Attack,
-		login: Login,
-		move: Move
-	);
+        equip: Equip,
+        attack: Attack,
+        login: Login,
+        move: Move
+    );
 }
 
 impl ws::Handler for WsClient {

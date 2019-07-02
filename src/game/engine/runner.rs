@@ -86,8 +86,10 @@ impl<'a> Runner {
 
         for intention in &self.player_intention_buffer {
             for player in world.players.iter_mut() {
-                if player.id == intention.player_id {
-                    player.intention.push(intention.intention.clone());
+                for _ in 0..999 {
+                    if player.id == intention.player_id {
+                        player.intention.push(intention.intention.clone());
+                    }
                 }
             }
         }

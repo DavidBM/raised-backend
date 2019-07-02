@@ -11,6 +11,7 @@ pub struct WaitingQueue {
     clients: Vec<net::GameClient>,
     receiver: Receiver<ClientActions>,
     players_count: u64,
+    game_count: u64,
 }
 
 impl WaitingQueue {
@@ -20,6 +21,7 @@ impl WaitingQueue {
             clients,
             receiver,
             players_count: 0,
+            game_count: 0,
         }
     }
 
@@ -53,35 +55,49 @@ impl WaitingQueue {
     }
 
     pub fn check_clients(&mut self) {
-        if self.clients.len() < 4 {
-            return;
+        if self.clients.len() >= 4 {
+            self.create_game();
         }
-
-        self.create_game();
     }
 
     fn create_game(&mut self) {
         let mut game = GameManager::new();
 
         for _ in 0..4 {
-            let client = self.clients.remove(0);
+            let client = self.clients.swap_remove(0);
             let player = self.create_player(client);
             game.add_player(player);
         }
 
-        thread::spawn(move || {
-            game.start();
-        });
+        let game_id = self.get_game_id();
+
+        let _ = thread::Builder::new()
+            .name(format!("Game {}", game_id))
+            .spawn(move || {
+                game.start();
+            })
+            .map_err(|err| error!("Error creating a game {} (thread): {:?}", game_id, err));
     }
 
     fn create_player(&mut self, client: net::GameClient) -> Player {
         let player_id = self.players_count;
         self.players_count += 1;
 
-        if self.players_count > u64::MAX - 10 {
+        if self.players_count == u64::MAX {
             self.players_count = 0;
         }
 
         Player::new(client, player_id)
+    }
+
+    fn get_game_id(&mut self) -> u64 {
+        let game_id = self.game_count;
+        self.game_count += 1;
+
+        if self.game_count == u64::MAX {
+            self.game_count = 0;
+        }
+
+        game_id
     }
 }

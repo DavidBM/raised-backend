@@ -22,19 +22,19 @@ impl GameClient {
     }
 
     pub fn get_messages(&self) -> Option<Vec<ClientPacket>> {
-        let mut messages: Vec<ClientPacket> = Vec::new();
+        let first_message = self.receiver.try_recv().ok()?;
+
+        let mut messages: Vec<ClientPacket> = Vec::with_capacity(5);
+
+        messages.push(first_message);
 
         while let Ok(game_message) = self.receiver.try_recv() {
             messages.push(game_message);
         }
 
-        trace!("Player packets: {:?}", messages);
+        trace!("Player packets: {} messages with content {:?}", messages.len(), messages);
 
-        if !messages.is_empty() {
-            Some(messages)
-        } else {
-            None
-        }
+        Some(messages)
     }
 
     pub fn send(&self, notification: &Effect) {
@@ -49,7 +49,7 @@ impl GameClient {
 
         match send_result {
             Ok(_) => trace!("Message send: {:?} {:?}", &self, notification),
-            Err(error) => trace!("{:?} {:?}", &self, error),
+            Err(error) => trace!("Error sending message to client: {:?} {:?} {:?}", &self, notification, error),
         }
     }
 }
