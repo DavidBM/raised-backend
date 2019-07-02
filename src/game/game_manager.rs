@@ -57,7 +57,7 @@ impl<'a> GameManager {
                 player.send(&update);
             }
 
-            // TODO: For now we send each effect to all players. 
+            // TODO: For now we send each effect to all players.
             // What we need to do is to create a function that decides to what player to send each effect.
 
             /*if let Some(player_id) = player_id {
