@@ -17,14 +17,14 @@ mod net;
 
 use crate::game::structs::ClientActions;
 use crate::game::WaitingQueue;
-use std::sync::mpsc::{channel as Channel, Receiver, Sender};
+use std::sync::mpsc::channel;
 use std::thread;
 
 fn main() {
     env_logger::from_env(env_logger::Env::default().default_filter_or("warn,ws=info")).init();
     warn!("Starting server...");
 
-    let (actions_sender, actions_receiver): (Sender<ClientActions>, Receiver<ClientActions>) = Channel();
+    let (actions_sender, actions_receiver) = channel::<ClientActions>();
 
     thread::spawn(move || {
         let mut waiting_queue = WaitingQueue::new(actions_receiver);
